@@ -1,81 +1,141 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 import { projects } from "@/lib/data";
 
+gsap.registerPlugin(ScrollTrigger);
+
 export default function Projects() {
-  const ref    = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
-
-  const [hovered,  setHovered]  = useState<number | null>(null);
+  const sectionRef  = useRef<HTMLElement>(null);
+  const headRef     = useRef<HTMLDivElement>(null);
+  const labelRef    = useRef<HTMLDivElement>(null);
+  const rowsRef     = useRef<HTMLDivElement[]>([]);
+  const [hovered, setHovered]   = useState<number | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const previewRef = useRef<HTMLDivElement>(null);
 
-  const onMove = (e: React.MouseEvent) =>
+  const onMove = (e: React.MouseEvent) => {
     setMousePos({ x: e.clientX, y: e.clientY });
+    if (previewRef.current) {
+      gsap.to(previewRef.current, { left: e.clientX + 28, top: e.clientY - 115, duration: 0.18, ease: "power2.out" });
+    }
+  };
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(labelRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, scrollTrigger: { trigger: sectionRef.current, start: "top 88%" } }
+      );
+      if (headRef.current) {
+        const lines = headRef.current.querySelectorAll(".head-line");
+        gsap.fromTo(lines,
+          { y: "105%", rotate: 0.8 },
+          { y: "0%", rotate: 0, duration: 0.95, stagger: 0.1, ease: "power4.out", scrollTrigger: { trigger: headRef.current, start: "top 82%" } }
+        );
+      }
+      rowsRef.current.forEach((row, i) => {
+        if (!row) return;
+        gsap.fromTo(row,
+          { opacity: 0, y: 25 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out", delay: i * 0.04, scrollTrigger: { trigger: row, start: "top 88%" } }
+        );
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (!previewRef.current) return;
+    if (hovered !== null) {
+      gsap.to(previewRef.current, { opacity: 1, scale: 1, rotate: 0, duration: 0.22, ease: "power2.out" });
+    } else {
+      gsap.to(previewRef.current, { opacity: 0, scale: 0.9, duration: 0.18, ease: "power2.in" });
+    }
+  }, [hovered]);
+
+  const hoveredProject = projects.find(p => p.id === hovered);
 
   return (
     <section
       id="projects"
-      ref={ref}
-      className="bg-[#0A0A0A] overflow-hidden border-t border-white/[0.07]"
+      ref={sectionRef}
+      className="bg-[#000000] overflow-hidden border-t border-white/[0.12]"
       onMouseMove={onMove}
     >
-      {/* ── Section label bar ─────────────────────────────── */}
-      <div className="flex items-center justify-between px-[6vw] py-5 border-b border-white/[0.07]">
-        <span className="text-white/25 text-[10px] uppercase tracking-[0.18em] font-semibold">
-          Selected Works
-        </span>
-        <span className="text-white/20 text-[10px] font-mono">03</span>
+      {/* Label */}
+      <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-6 border-b border-white/[0.12]" style={{ opacity: 0 }}>
+        <span className="section-label-dark">Selected Works</span>
+        <span className="text-white/25 text-[12px] font-mono-custom">05</span>
       </div>
 
-      {/* ── Headline ──────────────────────────────────────── */}
-      <div className="px-[6vw] pt-16 pb-12 overflow-hidden">
-        <motion.h2
-          initial={{ y: "105%" }}
-          animate={inView ? { y: 0 } : {}}
-          transition={{ duration: 0.85, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] }}
-          className="font-display text-[#EDEDED] uppercase leading-none"
-          style={{ fontSize: "clamp(3rem, 11vw, 10rem)" }}
-        >
-          Selected<br />Works
-        </motion.h2>
+      {/* Headline */}
+      <div ref={headRef} className="px-[5vw] pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
+        <div className="overflow-hidden">
+          <h2
+            className="head-line font-display text-[#EFEFEF] uppercase leading-none block"
+            style={{ fontSize: "clamp(3.5rem, 12vw, 11rem)", transform: "translateY(105%)" }}
+          >
+            Selected
+          </h2>
+        </div>
+        <div className="overflow-hidden">
+          <h2
+            className="head-line font-display uppercase leading-none block"
+            style={{
+              fontSize: "clamp(3.5rem, 12vw, 11rem)",
+              transform: "translateY(105%)",
+              WebkitTextStroke: "2px #D4FF00",
+              color: "transparent",
+            }}
+          >
+            Works
+          </h2>
+        </div>
       </div>
 
-      {/* ── Project rows ──────────────────────────────────── */}
-      <div className="relative border-t border-white/[0.07]">
+      {/* Project rows */}
+      <div className="border-t border-white/[0.12]">
         {projects.map((project, i) => (
-          <motion.div
+          <div
             key={project.id}
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ delay: 0.1 + i * 0.09, duration: 0.5 }}
+            ref={(el) => { rowsRef.current[i] = el!; }}
             onMouseEnter={() => setHovered(project.id)}
             onMouseLeave={() => setHovered(null)}
-            className="group flex flex-col md:flex-row md:items-center justify-between gap-4 px-[6vw] py-8 md:py-10 border-b border-white/[0.07] hover:bg-white/[0.025] transition-colors duration-300 cursor-pointer"
+            className="group flex flex-col md:flex-row md:items-center gap-4 px-[5vw] py-12 md:py-16 border-b border-white/[0.12] hover:bg-white/[0.04] transition-colors duration-300 cursor-pointer"
+            style={{ opacity: 0 }}
           >
             {/* Index */}
-            <span className="text-white/15 text-xs font-mono min-w-[2rem] flex-shrink-0">
+            <span className="text-white/12 text-[10px] font-mono-custom md:min-w-[2.2rem] flex-shrink-0">
               {String(i + 1).padStart(2, "0")}
             </span>
 
             {/* Name */}
-            <h3
-              className="font-display text-white uppercase tracking-tight group-hover:translate-x-3 transition-transform duration-500 flex-1 md:mx-6"
-              style={{ fontSize: "clamp(1.8rem, 5vw, 4.5rem)", lineHeight: 1 }}
-            >
-              {project.name}
-            </h3>
+            <div className="flex-1 md:mx-6">
+              <h3
+                className="font-display text-white uppercase tracking-tight group-hover:translate-x-2 transition-transform duration-400"
+                style={{ fontSize: "clamp(2rem, 4.5vw, 4.2rem)", lineHeight: 1 }}
+              >
+                {project.name}
+              </h3>
+              {project.award && (
+                <span className="inline-block mt-2 text-[#D4FF00] text-[10px] uppercase tracking-widest font-bold font-mono-custom">
+                  ↑ {project.award}
+                </span>
+              )}
+            </div>
 
-            {/* Category + tech pills */}
-            <div className="flex-1 md:text-right space-y-1.5">
-              <p className="text-white/30 text-[10px] uppercase tracking-[0.15em]">
+            {/* Meta */}
+            <div className="md:text-right space-y-1.5 flex-shrink-0 min-w-[180px]">
+              <p className="text-white/30 text-[10px] uppercase tracking-[0.14em] font-mono-custom">
                 {project.category}
               </p>
-              <div className="flex md:justify-end flex-wrap gap-2">
+              <div className="flex md:justify-end flex-wrap gap-3">
                 {project.tech.slice(0, 3).map((t) => (
-                  <span key={t} className="text-white/18 text-[10px]">{t}</span>
+                  <span key={t} className="text-white/18 text-[10px] font-mono-custom">{t}</span>
                 ))}
               </div>
             </div>
@@ -85,44 +145,40 @@ export default function Projects() {
               href={project.live !== "#" ? project.live : project.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-shrink-0 md:ml-8 text-white/20 group-hover:text-[#7fb069] group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300"
+              className="flex-shrink-0 md:ml-6 w-12 h-12 rounded-none border-2 border-white/[0.15] flex items-center justify-center text-white/30 group-hover:text-[#000] group-hover:border-[#D4FF00] group-hover:bg-[#D4FF00] transition-all duration-300"
               onClick={(e) => e.stopPropagation()}
             >
-              <ArrowUpRight size={22} />
+              <ArrowUpRight size={16} />
             </a>
-          </motion.div>
+          </div>
         ))}
       </div>
 
-      {/* ── Floating preview card (follows cursor) ────────── */}
-      <AnimatePresence>
-        {hovered !== null && (() => {
-          const proj = projects.find((p) => p.id === hovered);
-          if (!proj) return null;
-          return (
-            <motion.div
-              key={hovered}
-              initial={{ opacity: 0, scale: 0.88, rotate: -1 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, scale: 0.88 }}
-              transition={{ duration: 0.22, ease: "easeOut" }}
-              className="fixed pointer-events-none z-50 w-[280px] h-[180px] md:w-[320px] md:h-[210px] rounded-2xl overflow-hidden shadow-2xl border border-white/10"
-              style={{ left: mousePos.x + 24, top: mousePos.y - 105 }}
-            >
-              <div
-                className={`w-full h-full bg-gradient-to-br ${proj.gradient} flex flex-col items-center justify-center`}
-              >
-                <p className="font-display text-[2.2rem] text-white/60 uppercase leading-none">
-                  {proj.name}
+      {/* Floating preview */}
+      <div
+        ref={previewRef}
+        className="hidden md:block fixed pointer-events-none z-[200] w-[320px] h-[200px] rounded-2xl overflow-hidden shadow-2xl border border-white/[0.1]"
+        style={{ opacity: 0, scale: 0.9, left: mousePos.x + 28, top: mousePos.y - 115 }}
+      >
+        {hoveredProject && (
+          <div className={`w-full h-full bg-gradient-to-br ${hoveredProject.gradient} flex flex-col items-start justify-end p-6 relative`}>
+            <div className="absolute inset-0 bg-black/30" />
+            <div className="relative z-10">
+              <p className="font-display text-[2.1rem] text-white uppercase leading-none mb-1">
+                {hoveredProject.name}
+              </p>
+              <p className="text-white/45 text-[9px] uppercase tracking-widest font-mono-custom">
+                {hoveredProject.category}
+              </p>
+              {hoveredProject.award && (
+                <p className="text-[#C8FF57] text-[9px] uppercase tracking-widest font-mono-custom mt-1">
+                  {hoveredProject.award}
                 </p>
-                <p className="text-white/30 text-xs mt-2 uppercase tracking-widest">
-                  {proj.category}
-                </p>
-              </div>
-            </motion.div>
-          );
-        })()}
-      </AnimatePresence>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

@@ -1,114 +1,125 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
 import { ArrowUpRight } from "lucide-react";
 
-const stats = [
-  { value: "4+",   label: "Projects Shipped"  },
-  { value: "2×",   label: "Hackathon Winner"   },
-  { value: "100",  label: "Lighthouse Score"   },
-];
-
-const lines = [
-  { text: "I BUILD",        accent: false },
-  { text: "SYSTEMS",        accent: true  },
-  { text: "THAT ACTUALLY",  accent: false },
-  { text: "WORK.",          accent: false },
-];
-
 export default function Hero() {
-  const ref    = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true });
+  const containerRef = useRef<HTMLElement>(null);
+  const headRef      = useRef<HTMLDivElement>(null);
+  const infoRef      = useRef<HTMLDivElement>(null);
+  const ctaRef       = useRef<HTMLDivElement>(null);
+  
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  const scrollTo = (id: string) =>
+  const onMove = (e: React.MouseEvent) => {
+    // Subtle parallax
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 20;
+    setMousePos({ x, y });
+  };
+
+  const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  const reveal = (i: number) => ({
-    hidden:  { y: "115%", opacity: 0 },
-    visible: {
-      y: 0, opacity: 1,
-      transition: { delay: 0.15 + i * 0.13, duration: 0.85, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] },
-    },
-  });
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Reveal headline
+      if (headRef.current) {
+        const lines = headRef.current.querySelectorAll(".hero-line");
+        gsap.fromTo(lines,
+          { y: "110%", rotate: 2 },
+          { y: "0%", rotate: 0, duration: 1.2, stagger: 0.12, ease: "power4.out", delay: 0.1 }
+        );
+      }
+      
+      // Reveal info
+      gsap.fromTo(infoRef.current,
+        { opacity: 0, x: -20 },
+        { opacity: 1, x: 0, duration: 0.8, ease: "power2.out", delay: 1 }
+      );
+
+      // Reveal buttons
+      gsap.fromTo(ctaRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", delay: 1.2 }
+      );
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
 
   return (
     <section
       id="hero"
-      ref={ref}
-      className="relative min-h-screen flex flex-col bg-[#0A0A0A] border-b border-white/[0.07]"
+      ref={containerRef}
+      onMouseMove={onMove}
+      className="relative min-h-[100vh] flex flex-col justify-center overflow-hidden grid-lines-dark bg-[#000000]"
+      style={{
+        backgroundPosition: `${mousePos.x * 0.5}px ${mousePos.y * 0.5}px`
+      }}
     >
-      {/* ── Stats bar ─────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 border-b border-white/[0.07] pt-24 md:pt-28">
-        {stats.map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 14 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.05 + i * 0.1, duration: 0.55 }}
-            className={`px-[4vw] md:px-[6vw] py-6 ${i < 2 ? "border-r border-white/[0.07]" : ""}`}
-          >
-            <p className="font-display text-[8vw] md:text-5xl lg:text-6xl text-white leading-none">{s.value}</p>
-            <p className="text-white/30 text-[10px] uppercase tracking-[0.15em] mt-1.5">{s.label}</p>
-          </motion.div>
-        ))}
-      </div>
+      {/* Heavy glow behind text */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] md:w-[40vw] md:h-[40vw] rounded-full blur-[140px] pointer-events-none opacity-40 transition-transform duration-100 ease-out"
+        style={{
+          background: "radial-gradient(circle, rgba(212,255,0,0.15) 0%, transparent 70%)",
+          transform: `translate(calc(-50% + ${mousePos.x * 1.5}px), calc(-50% + ${mousePos.y * 1.5}px))`
+        }}
+      />
 
-      {/* ── Main headline ──────────────────────────────────────── */}
-      <div className="flex-1 flex items-center px-[4vw] md:px-[5vw] py-14 md:py-20">
-        <div className="w-full">
-          {lines.map((line, i) => (
-            <div key={i} className="overflow-hidden leading-none">
-              <motion.h1
-                variants={reveal(i)}
-                initial="hidden"
-                animate={inView ? "visible" : "hidden"}
-                className={[
-                  "font-display leading-[0.84] tracking-tight block select-none",
-                  "text-[14vw] md:text-[13vw]",
-                  line.accent ? "text-[#7fb069]" : "text-white",
-                ].join(" ")}
+      <div className="px-[5vw] relative z-10 w-full mb-16 md:mb-24">
+        {/* Info header */}
+        <div ref={infoRef} className="flex items-center gap-4 mb-10 md:mb-14" style={{ opacity: 0 }}>
+          <div className="w-2.5 h-2.5 bg-[#D4FF00] animate-pulse" />
+          <p className="text-white/60 text-[11px] md:text-[13px] uppercase tracking-[0.2em] font-mono-custom font-bold">
+            Samarth Sugandhi
+            <span className="mx-3 text-white/20">|</span>
+            Creative Developer
+          </p>
+        </div>
+
+        {/* Headline */}
+        <div ref={headRef} className="space-y-0">
+          {[
+            { text: "Building", color: "#FFF" },
+            { text: "Production", color: "#FFF" },
+            { text: "Ready Systems", color: "#D4FF00" },
+          ].map((line, i) => (
+            <div key={i} className="overflow-hidden py-1">
+              <h1
+                className="hero-line font-display leading-[0.85] uppercase block tracking-tight hover:scale-[1.01] transition-transform duration-500 origin-left"
+                style={{
+                  fontSize: "clamp(4.5rem, 15vw, 12rem)",
+                  color: line.color,
+                  transform: "translateY(110%)",
+                }}
               >
                 {line.text}
-              </motion.h1>
+              </h1>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ── Bottom strip ──────────────────────────────────────── */}
-      <div className="grid md:grid-cols-2 border-t border-white/[0.07]">
-        <div className="px-[6vw] py-9 border-b md:border-b-0 md:border-r border-white/[0.07]">
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ delay: 0.75, duration: 0.6 }}
-            className="text-white/45 text-base md:text-lg leading-relaxed max-w-md"
-          >
-            I don&apos;t just build websites. I architect scalable backend systems,
-            autonomous agents, and fluid interfaces to solve real-world problems.
-          </motion.p>
+      {/* CTA */}
+      <div
+        ref={ctaRef}
+        className="absolute bottom-16 md:bottom-24 left-0 right-0 px-[5vw] flex flex-col md:flex-row items-start md:items-center justify-between gap-10"
+        style={{ opacity: 0 }}
+      >
+        <div className="flex gap-4">
+          <button onClick={() => scrollTo("projects")} className="btn-primary">
+            Explore Work
+          </button>
+          <button onClick={() => scrollTo("why")} className="btn-secondary hidden md:inline-flex">
+            About Me
+          </button>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : {}}
-          transition={{ delay: 0.85, duration: 0.5 }}
-          className="px-[6vw] py-9 flex flex-wrap items-center gap-4"
-        >
-          <button
-            onClick={() => scrollTo("projects")}
-            className="flex items-center gap-2.5 px-7 py-4 rounded-full bg-[#7fb069] hover:bg-[#6a9658] text-[#0A0A0A] font-bold text-[11px] uppercase tracking-widest transition-all duration-300 hover:scale-105 active:scale-95"
-          >
-            Explore Work <ArrowUpRight size={15} />
-          </button>
-          <button
-            onClick={() => scrollTo("contact")}
-            className="flex items-center gap-2.5 px-7 py-4 rounded-full border border-white/15 text-white hover:border-white/40 hover:bg-white/[0.04] font-bold text-[11px] uppercase tracking-widest transition-all duration-300"
-          >
-            Contact
-          </button>
-        </motion.div>
+        
+        <div className="text-white/20 text-[10px] md:text-[12px] uppercase tracking-[0.2em] font-mono-custom max-w-[240px] md:text-right">
+          Engineering scalable web apps &amp; intelligent AI agents.
+        </div>
       </div>
     </section>
   );

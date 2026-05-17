@@ -1,20 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 
 @import "tailwindcss";
 
-/* ─── Design Tokens ───────────────────────────────────────── */
+/* ─── Design Tokens (Brutalist / High-End) ───────────────── */
 :root {
-  --bg-primary:   #0A0A0A;
-  --bg-light:     #F0EDE6;
-  --bg-pink:      #C75B7A;
-  --bg-blue:      #4A6FA5;
-  --color-sage:   #7FB069;
-  --color-sage-d: #5E8C4A;
-  --color-text:   #EDEDED;
-  --color-muted:  rgba(237, 237, 237, 0.45);
-  --color-dark:   #111111;
-  --border-dark:  rgba(255, 255, 255, 0.07);
-  --border-light: rgba(0, 0, 0, 0.09);
+  /* Backgrounds */
+  --bg-primary:    #000000;
+  --bg-secondary:  #0A0A0A;
+  --bg-light:      #F4F4F0;
+
+  /* Accent — Acid Yellow / Lime */
+  --accent:        #D4FF00;
+  --accent-d:      #BBE600;
+  --accent-dk:     #8DAE00;
+
+  /* Text */
+  --color-text:    #FFFFFF;
+  --color-muted:   rgba(255, 255, 255, 0.55);
+  --color-dark:    #0A0A0A;
+
+  /* Borders */
+  --border-dark:   rgba(255, 255, 255, 0.12);
+  --border-light:  rgba(0, 0, 0, 0.15);
+
+  /* WhyIBuild blocks */
+  --block-1:       #0A0A0A;
+  --block-2:       #111111;
+  --block-3:       #161616;
+
+  /* Nav height */
+  --nav-h: 72px;
 }
 
 /* ─── Reset ───────────────────────────────────────────────── */
@@ -39,63 +54,186 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Bebas Neue', sans-serif;
   letter-spacing: 0.04em;
 }
+.font-mono-custom { font-family: 'JetBrains Mono', monospace; }
 
 /* ─── Selection ───────────────────────────────────────────── */
-::selection {
-  background: var(--color-sage);
-  color: #0A0A0A;
-}
+::selection { background: var(--accent); color: #000; }
 
 /* ─── Scrollbar ───────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 4px; }
 ::-webkit-scrollbar-track  { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.12); border-radius: 2px; }
-*                          { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) var(--bg-primary); }
+::-webkit-scrollbar-thumb  { background: rgba(212,255,0,0.3); border-radius: 0px; }
+*                          { scrollbar-width: thin; scrollbar-color: rgba(212,255,0,0.3) var(--bg-primary); }
 
-/* ─── Grain / Noise Overlay ───────────────────────────────── */
-.noise-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.038;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 200px;
-  animation: grain 0.55s steps(1) infinite;
+/* ─── Navbar Glass ────────────────────────────────────────── */
+.navbar-glass {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-dark);
 }
 
-@keyframes grain {
-  0%   { background-position:   0%   0%; }
-  10%  { background-position:  -5% -10%; }
-  20%  { background-position: -15%  5%; }
-  30%  { background-position:   7% -25%; }
-  40%  { background-position:  -5%  25%; }
-  50%  { background-position: -15%  10%; }
-  60%  { background-position:  15%   0%; }
-  70%  { background-position:   0%  15%; }
-  80%  { background-position:   3%  35%; }
-  90%  { background-position: -10%  10%; }
-  100% { background-position:   0%   0%; }
+/* ═══════════════════════════════════════════════════════════
+   BRUTALIST BUTTON SYSTEM
+═══════════════════════════════════════════════════════════ */
+
+/* Primary Button — High Contrast, Thick Border */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 36px;
+  background: var(--accent);
+  color: #000;
+  font-weight: 800;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 2px solid var(--accent);
+  border-radius: 0px; /* Brutalist sharp corners */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
 }
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #000;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  z-index: -1;
+}
+
+.btn-primary:hover {
+  color: var(--accent);
+}
+
+.btn-primary:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Secondary Button — Ghost / Outline */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 36px;
+  background: transparent;
+  color: #FFF;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 0px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: #000;
+  background: var(--accent);
+}
+
+/* Dark Section Primary Button (used in Light sections) */
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 36px;
+  background: #000;
+  color: #FFF;
+  font-weight: 800;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 2px solid #000;
+  border-radius: 0px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn-dark:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+}
+
+/* Text Button with animated arrow */
+.btn-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease, gap 0.25s ease;
+}
+.btn-text:hover { color: var(--accent); gap: 16px; }
 
 /* ─── Utilities ───────────────────────────────────────────── */
-.section-px      { padding-left: 6vw; padding-right: 6vw; }
-.section-padding { padding: 7rem 0; }
 
-/* Dot pattern (light-section grid) */
+/* Section Labels - MUCH LARGER AND MORE VISIBLE */
+.section-label-dark {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.section-label-light {
+  color: rgba(0, 0, 0, 0.8);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.grid-lines-dark {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 100px 100px;
+}
+
 .dot-pattern {
-  background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
-/* Legacy compat */
-.glass-card, .glass-panel {
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border-dark);
-  transition: background 0.3s;
+/* Link underline */
+.link-underline { position: relative; display: inline-block; }
+.link-underline::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+  background: var(--accent); transition: width 0.3s ease;
 }
-.glass-card:hover { background: rgba(255,255,255,0.04); }
+.link-underline:hover::after { width: 100%; }
 
-.gradient-text       { color: var(--color-text); }
-.gradient-text-green { color: var(--color-sage); }
-.gradient-bg-indigo  { background: transparent; }
+/* Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 20s linear infinite; }
+.marquee-track:hover { animation-play-state: paused; }

@@ -1,21 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { motion, useInView } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { personalInfo } from "@/lib/data";
 import { ArrowUpRight, CheckCircle2, Send } from "lucide-react";
 
+gsap.registerPlugin(ScrollTrigger);
+
 type Status = "idle" | "sending" | "success" | "error";
 
-const fields = [
-  { id: "name",    label: "Name",    type: "text"  },
-  { id: "email",   label: "Email",   type: "email" },
-] as const;
-
 export default function Contact() {
-  const ref    = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const sectionRef = useRef<HTMLElement>(null);
+  const labelRef   = useRef<HTMLDivElement>(null);
+  const headRef    = useRef<HTMLDivElement>(null);
+  const ctaRef     = useRef<HTMLDivElement>(null);
+  const formRef    = useRef<HTMLDivElement>(null);
+  const linksRef   = useRef<HTMLDivElement>(null);
 
   const [form,   setForm]   = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<Status>("idle");
@@ -26,109 +28,155 @@ export default function Contact() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setStatus("sending");
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((r) => setTimeout(r, 700));
     window.location.href = `mailto:${personalInfo.email}?subject=Contact from ${encodeURIComponent(form.name)}&body=${encodeURIComponent(form.message)}%0A%0AFrom: ${encodeURIComponent(form.email)}`;
     setStatus("success");
     setForm({ name: "", email: "", message: "" });
     setTimeout(() => setStatus("idle"), 4000);
   };
 
-  return (
-    <section id="contact" ref={ref} className="overflow-hidden">
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(labelRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, scrollTrigger: { trigger: sectionRef.current, start: "top 88%" } }
+      );
+      if (headRef.current) {
+        const lines = headRef.current.querySelectorAll(".contact-headline");
+        gsap.fromTo(lines,
+          { y: "105%", rotate: 0.8 },
+          { y: "0%", rotate: 0, duration: 0.9, stagger: 0.12, ease: "power4.out", scrollTrigger: { trigger: headRef.current, start: "top 82%" } }
+        );
+      }
+      gsap.fromTo(ctaRef.current,
+        { opacity: 0, y: 28 },
+        { opacity: 1, y: 0, duration: 0.75, scrollTrigger: { trigger: ctaRef.current, start: "top 80%" } }
+      );
+      gsap.fromTo(formRef.current,
+        { opacity: 0, y: 32 },
+        { opacity: 1, y: 0, duration: 0.8, scrollTrigger: { trigger: formRef.current, start: "top 84%" } }
+      );
+      gsap.fromTo(linksRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.6, scrollTrigger: { trigger: linksRef.current, start: "top 85%" } }
+      );
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
 
-      {/* ── Dark CTA block ────────────────────────────────── */}
-      <div className="bg-[#0A0A0A] border-t border-white/[0.07]">
-        <div className="flex items-center justify-between px-[6vw] py-5 border-b border-white/[0.07]">
-          <span className="text-white/25 text-[10px] uppercase tracking-[0.18em] font-semibold">Contact</span>
-          <span className="text-white/20 text-[10px] font-mono">06</span>
+  return (
+    <section id="contact" ref={sectionRef} className="overflow-hidden">
+
+      {/* ── Dark CTA block ─────────────────────────────────── */}
+      <div className="bg-[#000000] border-t border-white/[0.12]">
+        <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-5 border-b border-white/[0.07]" style={{ opacity: 0 }}>
+          <span className="section-label-dark">Contact</span>
+          <span className="text-white/18 text-[10px] font-mono-custom">08</span>
         </div>
 
-        <div className="px-[6vw] py-20 md:py-28 grid md:grid-cols-2 gap-14 md:gap-20 items-end">
-
+        <div className="px-[5vw] py-28 md:py-40 grid md:grid-cols-2 gap-20 md:gap-28 items-end">
           {/* Headline */}
-          <div className="overflow-hidden">
-            <motion.h2
-              initial={{ y: "105%" }}
-              animate={inView ? { y: 0 } : {}}
-              transition={{ duration: 0.85, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] }}
-              className="font-display text-white uppercase leading-[0.9]"
-              style={{ fontSize: "clamp(2.5rem, 7vw, 6.5rem)" }}
-            >
-              Ready to build something that actually works?
-            </motion.h2>
+          <div ref={headRef}>
+            <div className="overflow-hidden">
+              <h2
+                className="contact-headline font-display text-white uppercase leading-[0.88]"
+                style={{ fontSize: "clamp(2.8rem, 7.5vw, 7rem)", display: "block", transform: "translateY(105%)" }}
+              >
+                Ready to build
+              </h2>
+            </div>
+            <div className="overflow-hidden">
+              <h2
+                className="contact-headline font-display text-[#D4FF00] uppercase leading-[0.88]"
+                style={{ fontSize: "clamp(2.8rem, 7.5vw, 7rem)", display: "block", transform: "translateY(105%)" }}
+              >
+                something real?
+              </h2>
+            </div>
           </div>
 
           {/* CTA side */}
-          <motion.div
-            initial={{ opacity: 0, y: 26 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.38, duration: 0.65 }}
-            className="space-y-8"
-          >
-            <p className="text-white/42 text-lg leading-relaxed">
-              Clear engineering, focused strategy — working together as one system.
+          <div ref={ctaRef} className="space-y-8" style={{ opacity: 0 }}>
+            <p className="text-white/42 text-[1.05rem] leading-[1.78] max-w-sm">
+              Clear engineering, focused strategy — working together as one system to ship products that actually matter.
             </p>
-
-            <a
-              href={`mailto:${personalInfo.email}`}
-              className="group inline-flex items-center gap-3 px-8 py-5 rounded-full bg-white text-[#0A0A0A] font-bold text-[11px] uppercase tracking-widest hover:bg-[#7fb069] transition-colors duration-300"
-            >
-              Let&apos;s talk
-              <ArrowUpRight
-                size={15}
-                className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200"
-              />
-            </a>
-
-            <div>
+            <div className="flex flex-wrap gap-4 items-center">
+              <a href={`mailto:${personalInfo.email}`} className="btn-primary">
+                Let&apos;s talk <ArrowUpRight size={14} />
+              </a>
               <a
-                href={`mailto:${personalInfo.email}`}
-                className="text-white/25 hover:text-white transition-colors text-sm"
+                href={personalInfo.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
               >
-                {personalInfo.email}
+                LinkedIn <ArrowUpRight size={13} />
               </a>
             </div>
-          </motion.div>
+            <a
+              href={`mailto:${personalInfo.email}`}
+              className="text-white/25 hover:text-[#D4FF00] transition-colors text-sm font-mono-custom link-underline block"
+            >
+              {personalInfo.email}
+            </a>
+          </div>
         </div>
       </div>
 
-      {/* ── Light form block ──────────────────────────────── */}
-      <div className="bg-[#F0EDE6] px-[6vw] py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.32, duration: 0.65 }}
-          className="max-w-2xl"
-        >
-          <div className="overflow-hidden mb-12">
-            <motion.h3
-              initial={{ y: "105%" }}
-              animate={inView ? { y: 0 } : {}}
-              transition={{ delay: 0.4, duration: 0.75, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] }}
+      {/* ── Social links bar ───────────────────────────────── */}
+      <div className="bg-[#F4F4F0] border-t border-black/[0.12]">
+        <div ref={linksRef} className="px-[5vw] py-7 flex flex-wrap items-center justify-between gap-4" style={{ opacity: 0 }}>
+          <p className="text-[#111111]/40 text-sm">Connect with me</p>
+          <div className="flex flex-wrap items-center gap-6">
+            {[
+              { label: "GitHub",    href: personalInfo.github    },
+              { label: "LinkedIn",  href: personalInfo.linkedin  },
+              { label: "Portfolio", href: "https://samarth-sugandhi-portfolio.vercel.app" },
+            ].map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-[#111111]/40 hover:text-[#000] transition-colors text-[11px] uppercase tracking-widest font-bold"
+              >
+                {l.label} <ArrowUpRight size={10} />
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Contact form ────────────────────────────────────── */}
+      <div className="bg-[#F4F4F0] px-[5vw] py-28 md:py-40 border-t border-black/[0.12]">
+        <div ref={formRef} className="max-w-2xl" style={{ opacity: 0 }}>
+          <div className="overflow-hidden mb-16 md:mb-20">
+            <h3
               className="font-display text-[#111111] uppercase leading-none"
-              style={{ fontSize: "clamp(2rem, 5vw, 4rem)" }}
+              style={{ fontSize: "clamp(2.2rem, 5vw, 4rem)" }}
             >
               Or send a message.
-            </motion.h3>
+            </h3>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-10">
-            {fields.map((f) => (
-              <div key={f.id}>
+            {(["name", "email"] as const).map((field) => (
+              <div key={field}>
                 <label
-                  htmlFor={f.id}
-                  className="block text-[10px] font-bold text-[#111111]/35 uppercase tracking-[0.18em] mb-3"
+                  htmlFor={field}
+                  className="block text-[10px] font-bold text-[#111111]/32 uppercase tracking-[0.18em] mb-3 font-mono-custom"
                 >
-                  {f.label} *
+                  {field === "name" ? "Your Name" : "Email Address"} *
                 </label>
                 <input
-                  id={f.id}
-                  name={f.id}
-                  type={f.type}
-                  value={form[f.id]}
+                  id={field}
+                  name={field}
+                  type={field === "email" ? "email" : "text"}
+                  value={form[field]}
                   onChange={onChange}
                   required
-                  className="w-full border-b border-black/12 bg-transparent py-3 focus:outline-none focus:border-[#7fb069] text-[#111111] text-lg transition-colors duration-200 placeholder:text-[#111111]/20"
+                  className="w-full border-b-2 border-black/[0.1] bg-transparent py-3.5 focus:outline-none focus:border-[#000] text-[#111111] text-[1.05rem] transition-colors duration-300 placeholder:text-[#111111]/20 rounded-none"
+                  placeholder={field === "name" ? "Samarth Sugandhi" : "hello@example.com"}
                 />
               </div>
             ))}
@@ -136,7 +184,7 @@ export default function Contact() {
             <div>
               <label
                 htmlFor="message"
-                className="block text-[10px] font-bold text-[#111111]/35 uppercase tracking-[0.18em] mb-3"
+                className="block text-[10px] font-bold text-[#111111]/32 uppercase tracking-[0.18em] mb-3 font-mono-custom"
               >
                 Message *
               </label>
@@ -147,33 +195,22 @@ export default function Contact() {
                 value={form.message}
                 onChange={onChange}
                 required
-                className="w-full border-b border-black/12 bg-transparent py-3 focus:outline-none focus:border-[#7fb069] text-[#111111] text-lg transition-colors duration-200 resize-none placeholder:text-[#111111]/20"
+                className="w-full border-b-2 border-black/[0.1] bg-transparent py-3.5 focus:outline-none focus:border-[#4E8A1A] text-[#111111] text-[1.05rem] transition-colors duration-300 resize-none placeholder:text-[#111111]/20"
+                placeholder="Tell me about your project..."
               />
             </div>
 
             <button
               type="submit"
               disabled={status === "sending" || status === "success"}
-              className={[
-                "flex items-center gap-3 px-8 py-4 rounded-full font-bold text-[11px] uppercase tracking-widest transition-all duration-300 disabled:opacity-60",
-                status === "success"
-                  ? "bg-[#7fb069] text-white"
-                  : "bg-[#111111] text-white hover:bg-[#7fb069]",
-              ].join(" ")}
+              className="btn-dark mt-4"
+              style={{ width: "100%" }}
             >
-              {status === "success" ? (
-                <CheckCircle2 size={15} />
-              ) : (
-                <Send size={15} />
-              )}
-              {status === "sending"
-                ? "Opening client…"
-                : status === "success"
-                ? "Message ready"
-                : "Send message"}
+              {status === "success" ? <CheckCircle2 size={15} /> : <Send size={15} />}
+              {status === "sending" ? "Opening client…" : status === "success" ? "Message ready ✓" : "Send message"}
             </button>
           </form>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

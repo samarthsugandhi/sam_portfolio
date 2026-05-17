@@ -4,51 +4,79 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export default function CustomCursor() {
-  const [isHovering, setIsHovering] = useState(false);
-  const [isMobile, setIsMobile]     = useState(true);
+  const [isMobile, setIsMobile] = useState(true);
+
+  // Use refs for direct DOM manipulation (zero-latency)
+  const dotRef  = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
   const mx = useMotionValue(-200);
   const my = useMotionValue(-200);
 
-  /* Large ring — more inertia */
   const rx = useSpring(mx, { stiffness: 130, damping: 18, mass: 0.6 });
   const ry = useSpring(my, { stiffness: 130, damping: 18, mass: 0.6 });
 
-  /* Small dot — snappy */
   const dx = useSpring(mx, { stiffness: 700, damping: 40 });
   const dy = useSpring(my, { stiffness: 700, damping: 40 });
-
-  const hovering = useRef(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.matchMedia("(pointer: fine)").matches) {
       setIsMobile(false);
     }
 
+    let isHoveringLink = false;
+    let isLightMode = false;
+
     const move = (e: MouseEvent) => {
       mx.set(e.clientX);
       my.set(e.clientY);
-    };
 
-    const check = (e: MouseEvent) => {
+      // Fast check for element under cursor
       const t = e.target as HTMLElement;
-      const over =
-        t.tagName === "A" ||
-        t.tagName === "BUTTON" ||
-        !!t.closest("a") ||
-        !!t.closest("button");
-      if (over !== hovering.current) {
-        hovering.current = over;
-        setIsHovering(over);
+      if (!t) return;
+
+      // 1. Check link hover
+      const overLink = t.tagName === "A" || t.tagName === "BUTTON" || !!t.closest("a") || !!t.closest("button");
+      
+      // 2. Check background context
+      const lightSection = !!t.closest('.bg-\\[\\#F4F4F0\\]') || !!t.closest('.bg-\\[\\#F2EFE8\\]');
+
+      // 3. Update DOM directly if state changed (skipping React render cycle for max smoothness)
+      if (overLink !== isHoveringLink || lightSection !== isLightMode) {
+        isHoveringLink = overLink;
+        isLightMode = lightSection;
+
+        if (dotRef.current) {
+          if (isHoveringLink) {
+            dotRef.current.style.width = "0px";
+            dotRef.current.style.height = "0px";
+            dotRef.current.style.opacity = "0";
+          } else {
+            dotRef.current.style.width = "6px";
+            dotRef.current.style.height = "6px";
+            dotRef.current.style.opacity = "1";
+            dotRef.current.style.backgroundColor = isLightMode ? "#4E8A1A" : "#FFFFFF";
+          }
+        }
+
+        if (ringRef.current) {
+          if (isHoveringLink) {
+            ringRef.current.style.width = "56px";
+            ringRef.current.style.height = "56px";
+            ringRef.current.style.borderColor = isLightMode ? "rgba(0,0,0,0.8)" : "rgba(212,255,0,0.9)";
+            ringRef.current.style.backgroundColor = isLightMode ? "rgba(0,0,0,0.05)" : "rgba(212,255,0,0.08)";
+          } else {
+            ringRef.current.style.width = "36px";
+            ringRef.current.style.height = "36px";
+            ringRef.current.style.borderColor = isLightMode ? "rgba(78,138,26,0.8)" : "rgba(255,255,255,0.3)";
+            ringRef.current.style.backgroundColor = isLightMode ? "rgba(78,138,26,0.15)" : "transparent";
+          }
+        }
       }
     };
 
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseover", check);
-    return () => {
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseover", check);
-    };
+    window.addEventListener("mousemove", move, { passive: true });
+    return () => window.removeEventListener("mousemove", move);
   }, [mx, my]);
 
   if (isMobile) return null;
@@ -59,37 +87,27 @@ export default function CustomCursor() {
 
       {/* Large ring */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full border"
+        ref={ringRef}
+        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full border transition-all duration-200 ease-out"
         style={{
-          x: rx,
-          y: ry,
-          translateX: "-50%",
-          translateY: "-50%",
+          width: 36, height: 36,
+          borderColor: "rgba(255,255,255,0.3)",
+          backgroundColor: "transparent",
+          x: rx, y: ry,
+          translateX: "-50%", translateY: "-50%",
         }}
-        animate={{
-          width:       isHovering ? 56 : 36,
-          height:      isHovering ? 56 : 36,
-          borderColor: isHovering ? "rgba(127,176,105,0.9)" : "rgba(237,237,237,0.35)",
-          backgroundColor: isHovering ? "rgba(127,176,105,0.08)" : "transparent",
-        }}
-        transition={{ type: "spring", stiffness: 280, damping: 22 }}
       />
 
       {/* Small dot */}
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-white"
+        ref={dotRef}
+        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full transition-all duration-200 ease-out"
         style={{
-          x: dx,
-          y: dy,
-          translateX: "-50%",
-          translateY: "-50%",
+          width: 6, height: 6,
+          backgroundColor: "#FFFFFF",
+          x: dx, y: ry,
+          translateX: "-50%", translateY: "-50%",
         }}
-        animate={{
-          width:  isHovering ? 0 : 5,
-          height: isHovering ? 0 : 5,
-          opacity: isHovering ? 0 : 1,
-        }}
-        transition={{ type: "spring", stiffness: 700, damping: 40 }}
       />
     </>
   );

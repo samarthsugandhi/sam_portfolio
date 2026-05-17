@@ -1,136 +1,154 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
 
-interface BlockData {
-  num:         string;
-  title:       string;
-  tagline:     string;
-  desc:        string;
-  bg:          string;
-  textColor:   string;
-  mutedColor:  string;
-  borderColor: string;
-  scrollTo:    string;
-}
-
-const blocks: BlockData[] = [
+const whyIBuild = [
   {
-    num:         "01",
-    title:       "Full Stack\nEngineering",
-    tagline:     "( every line is impact )",
-    desc:        "I architect and build complete systems — from scalable database schemas and REST API design to performant, pixel-perfect user interfaces. I write clean code with long-term maintainability in mind.",
-    bg:          "#0A0A0A",
-    textColor:   "#EDEDED",
-    mutedColor:  "rgba(237,237,237,0.38)",
-    borderColor: "rgba(255,255,255,0.07)",
-    scrollTo:    "projects",
+    id: 1,
+    num: "01",
+    title: "AI-Powered\nWorkflows",
+    desc: "I architect systems that aren't just fast, but intelligent. Integrating multi-agent logic into traditional SaaS architectures to automate complex B2B settlements and reduce manual overhead.",
+    bgColor: "#000000",
+    textColor: "#FFF",
+    mutedColor: "rgba(255,255,255,0.55)",
+    accentColor: "#D4FF00",
+    scrollTo: "projects"
   },
   {
-    num:         "02",
-    title:       "AI &\nAutomation",
-    tagline:     "( intelligent systems )",
-    desc:        "Integrating LLMs and autonomous agents into real product workflows. From AI assistants to automated data pipelines — I build systems that replace manual overhead and deliver tangible value.",
-    bg:          "#C75B7A",
-    textColor:   "#0A0A0A",
-    mutedColor:  "rgba(10,10,10,0.48)",
-    borderColor: "rgba(0,0,0,0.12)",
-    scrollTo:    "projects",
+    id: 2,
+    num: "02",
+    title: "Production-Grade\nFull Stack",
+    desc: "From Next.js frontends to resilient Node.js / PostgreSQL backends. I don't just build UI; I design scalable database schemas, implement RBAC, and handle real-time concurrency.",
+    bgColor: "#0A0A0A",
+    textColor: "#FFF",
+    mutedColor: "rgba(255,255,255,0.55)",
+    accentColor: "#D4FF00",
+    scrollTo: "projects"
   },
   {
-    num:         "03",
-    title:       "Systems\nDesign",
-    tagline:     "( choosing the right problem )",
-    desc:        "Before writing a line of code, I think deeply about the architecture. Role-based access, real-time data, race conditions, and edge cases — I plan for systems that scale beyond the demo.",
-    bg:          "#3D5A8E",
-    textColor:   "#F0EDE6",
-    mutedColor:  "rgba(240,237,230,0.45)",
-    borderColor: "rgba(0,0,0,0.12)",
-    scrollTo:    "about",
-  },
+    id: 3,
+    num: "03",
+    title: "Pixel-Perfect\nEngineering",
+    desc: "Design is engineering. I build high-contrast, performant interfaces using GSAP and Framer Motion. Every animation is intentional, and every component serves the core product experience.",
+    bgColor: "#000000",
+    textColor: "#FFF",
+    mutedColor: "rgba(255,255,255,0.55)",
+    accentColor: "#D4FF00",
+    scrollTo: "projects"
+  }
 ];
 
-function Block({ block, index }: { block: BlockData; index: number }) {
-  const ref    = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
-  const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-
-  return (
-    <div ref={ref} style={{ backgroundColor: block.bg }} className="overflow-hidden">
-      <div
-        className="px-[6vw] py-20 md:py-28 grid md:grid-cols-[1fr_1.4fr] gap-12 md:gap-20 items-start border-b"
-        style={{ borderColor: block.borderColor }}
-      >
-        {/* Left — number + title */}
-        <div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ delay: index * 0.04, duration: 0.5 }}
-            className="text-sm font-mono mb-5"
-            style={{ color: block.mutedColor }}
-          >
-            {block.num}
-          </motion.p>
-
-          <div className="overflow-hidden">
-            <motion.h2
-              initial={{ y: "105%" }}
-              animate={inView ? { y: 0 } : {}}
-              transition={{ delay: 0.1, duration: 0.82, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] }}
-              className="font-display leading-[0.88] uppercase whitespace-pre-line"
-              style={{
-                color: block.textColor,
-                fontSize: "clamp(3rem, 8vw, 7rem)",
-              }}
-            >
-              {block.title}
-            </motion.h2>
-          </div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ delay: 0.28, duration: 0.5 }}
-            className="mt-4 text-sm"
-            style={{ color: block.mutedColor }}
-          >
-            {block.tagline}
-          </motion.p>
-        </div>
-
-        {/* Right — description + link */}
-        <motion.div
-          initial={{ opacity: 0, y: 22 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.32, duration: 0.65 }}
-          className="flex flex-col justify-between h-full gap-14 md:pt-4"
-        >
-          <p className="text-base md:text-lg leading-relaxed" style={{ color: block.mutedColor }}>
-            {block.desc}
-          </p>
-          <button
-            onClick={() => scrollTo(block.scrollTo)}
-            className="self-start flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] font-bold hover:gap-4 transition-all duration-300"
-            style={{ color: block.textColor }}
-          >
-            Learn more <ArrowUpRight size={14} />
-          </button>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
+gsap.registerPlugin(ScrollTrigger);
 
 export default function WhyIBuild() {
+  const containerRef = useRef<HTMLElement>(null);
+  const labelRef     = useRef<HTMLDivElement>(null);
+  const blockRefs    = useRef<HTMLDivElement[]>([]);
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(labelRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.5, scrollTrigger: { trigger: containerRef.current, start: "top 88%" } }
+      );
+      
+      blockRefs.current.forEach((block) => {
+        if (!block) return;
+        const num   = block.querySelector(".block-num");
+        const title = block.querySelector(".block-title");
+        const cont  = block.querySelector(".block-content");
+
+        gsap.fromTo(num,
+          { opacity: 0, x: -20 },
+          { opacity: 1, x: 0, duration: 0.5, scrollTrigger: { trigger: block, start: "top 85%" } }
+        );
+        gsap.fromTo(title,
+          { y: "105%", rotate: 0.8 },
+          { y: "0%", rotate: 0, duration: 0.8, ease: "power4.out", scrollTrigger: { trigger: block, start: "top 80%" } }
+        );
+        gsap.fromTo(cont,
+          { opacity: 0, y: 30 },
+          { opacity: 1, y: 0, duration: 0.7, ease: "power2.out", delay: 0.1, scrollTrigger: { trigger: block, start: "top 80%" } }
+        );
+      });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="border-t border-white/[0.07]">
-      {blocks.map((block, i) => (
-        <Block key={block.num} block={block} index={i} />
+    <section id="why" ref={containerRef}>
+      {/* Label */}
+      <div className="bg-[#000000] border-t border-white/[0.12]">
+        <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-6 border-b border-white/[0.12]" style={{ opacity: 0 }}>
+          <span className="section-label-dark">What I Do</span>
+          <span className="text-white/25 text-[12px] font-mono-custom">03</span>
+        </div>
+      </div>
+
+      {whyIBuild.map((block, i) => (
+        <div
+          key={block.id}
+          className="relative overflow-hidden border-t border-white/[0.12]"
+          style={{ backgroundColor: block.bgColor, color: block.textColor }}
+        >
+          {/* Accent glow */}
+          <div
+            className="absolute top-0 right-0 w-[80vw] h-[80vw] md:w-[40vw] md:h-[40vw] rounded-full blur-[120px] pointer-events-none opacity-40 translate-x-1/3 -translate-y-1/3"
+            style={{ background: block.accentColor }}
+          />
+
+          <div
+            ref={(el) => { blockRefs.current[i] = el!; }}
+            className="px-[5vw] py-28 md:py-40 grid md:grid-cols-[1fr_1.5fr] gap-16 md:gap-24 items-start relative z-10"
+          >
+            {/* Left */}
+            <div>
+              <p
+                className="block-num text-[12px] font-mono-custom font-bold mb-6"
+                style={{ color: block.accentColor, opacity: 0 }}
+              >
+                {block.num}
+              </p>
+              <div className="overflow-hidden">
+                <h2
+                  className="block-title font-display leading-[0.88] uppercase whitespace-pre-line"
+                  style={{
+                    fontSize: "clamp(3.5rem, 8vw, 7rem)",
+                    display: "block",
+                    transform: "translateY(105%)",
+                  }}
+                >
+                  {block.title}
+                </h2>
+              </div>
+            </div>
+
+            {/* Right */}
+            <div
+              className="block-content flex flex-col justify-between h-full gap-12 md:pt-6"
+              style={{ opacity: 0 }}
+            >
+              <p className="text-[1.1rem] leading-[1.82]" style={{ color: block.mutedColor }}>
+                {block.desc}
+              </p>
+              <button
+                onClick={() => scrollTo(block.scrollTo)}
+                className="self-start btn-secondary"
+                style={{ marginTop: "1rem" }}
+              >
+                See work
+                <ArrowUpRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
       ))}
     </section>
   );

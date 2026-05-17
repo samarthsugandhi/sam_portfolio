@@ -1,117 +1,132 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { personalInfo } from "@/lib/data";
+import { ArrowUpRight } from "lucide-react";
 
-const headLines = [
-  "Full-stack developer.",
-  "I build real systems,",
-  "not just side projects.",
-];
+gsap.registerPlugin(ScrollTrigger);
 
 const facts = [
-  { label: "Expertise",       value: "4+ Projects Shipped"         },
-  { label: "Hackathon Wins",  value: "2 First Places"              },
-  { label: "Currently"  ,     value: "AI Agents & Automation"      },
+  { label: "Degree",         value: "B.E. — Information Science" },
+  { label: "CGPA",           value: "8.24 / 10.0"                },
+  { label: "Hackathon Wins", value: "3 National Placements"       },
+  { label: "Currently",      value: "AI Agents & Automation"      },
 ];
 
 export default function About() {
-  const ref    = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
+  const sectionRef = useRef<HTMLElement>(null);
+  const headRef    = useRef<HTMLDivElement>(null);
+  const bioRef     = useRef<HTMLDivElement>(null);
+  const factsRef   = useRef<HTMLDivElement>(null);
+  const labelRef   = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(labelRef.current,
+        { opacity: 0, x: -20 },
+        { opacity: 1, x: 0, duration: 0.6, scrollTrigger: { trigger: labelRef.current, start: "top 88%" } }
+      );
+      if (headRef.current) {
+        const lines = headRef.current.querySelectorAll(".headline-line");
+        gsap.fromTo(lines,
+          { y: "105%", rotate: 1 },
+          { y: "0%", rotate: 0, duration: 0.9, stagger: 0.12, ease: "power4.out", scrollTrigger: { trigger: headRef.current, start: "top 82%" } }
+        );
+      }
+      gsap.fromTo(bioRef.current,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, scrollTrigger: { trigger: bioRef.current, start: "top 80%" } }
+      );
+      if (factsRef.current) {
+        gsap.fromTo(factsRef.current.querySelectorAll(".fact-item"),
+          { opacity: 0, x: 30 },
+          { opacity: 1, x: 0, duration: 0.6, stagger: 0.1, scrollTrigger: { trigger: factsRef.current, start: "top 80%" } }
+        );
+      }
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
+  const headLines = ["Full-stack developer.", "Real systems,", "not side projects."];
 
   return (
-    <section
-      id="about"
-      ref={ref}
-      className="bg-[#F0EDE6] text-[#111111] overflow-hidden"
-    >
-      {/* Section label */}
-      <div className="flex items-center justify-between px-[6vw] py-5 border-b border-black/[0.08]">
-        <span className="text-[#111111]/35 text-[10px] uppercase tracking-[0.18em] font-semibold">
-          About
-        </span>
-        <span className="text-[#111111]/25 text-[10px] font-mono">02</span>
+    <section id="about" ref={sectionRef} className="bg-[#F2EFE8] text-[#111111] overflow-hidden dot-pattern">
+      {/* Label */}
+      <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-5 border-b border-black/[0.08]" style={{ opacity: 0 }}>
+        <span className="section-label-light">About</span>
+        <span className="text-[#111111]/22 text-[10px] font-mono-custom">02</span>
       </div>
 
-      <div className="px-[6vw] py-20 md:py-28">
-
-        {/* ── Big headline ──────────────────────────────────── */}
-        <div className="mb-20 md:mb-24">
+      <div className="px-[5vw] py-28 md:py-40">
+        {/* Headline */}
+        <div ref={headRef} className="mb-24 md:mb-32">
           {headLines.map((line, i) => (
             <div key={i} className="overflow-hidden">
-              <motion.h2
-                initial={{ y: "105%" }}
-                animate={inView ? { y: 0 } : {}}
-                transition={{ delay: i * 0.14, duration: 0.82, ease: [0.33, 1, 0.68, 1] as [number, number, number, number] }}
-                className="font-display leading-[0.92] text-[#111111] uppercase"
-                style={{ fontSize: "clamp(2.5rem, 7vw, 6rem)" }}
-              >
-                {line}
-              </motion.h2>
+              <div className="headline-line" style={{ display: "block", transform: "translateY(105%)" }}>
+                <h2
+                  className="font-display leading-[0.9] text-[#111111] uppercase"
+                  style={{ fontSize: "clamp(2.8rem, 7.5vw, 6.5rem)" }}
+                >
+                  {line}
+                </h2>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* ── Two-column body ───────────────────────────────── */}
-        <div className="grid md:grid-cols-2 gap-14 md:gap-20 border-t border-black/[0.08] pt-14">
-
-          {/* Left — bio */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.5, duration: 0.65 }}
-            className="space-y-5"
-          >
-            <p className="text-[#111111]/70 text-[1.05rem] leading-relaxed">
+        {/* Two-column */}
+        <div className="grid md:grid-cols-[1.1fr_1fr] gap-20 md:gap-32 border-t border-black/[0.08] pt-16 md:pt-20">
+          {/* Bio */}
+          <div ref={bioRef} className="space-y-8" style={{ opacity: 0 }}>
+            <p className="text-[#111111]/65 text-[1.05rem] leading-[1.78]">
               I&apos;m{" "}
               <span className="text-[#111111] font-bold">Samarth Sugandhi</span>,
               a full-stack developer in my{" "}
-              <span className="text-[#7fb069] font-bold">
-                6th semester at BEC (Information Science)
-              </span>
-              .
+              <span className="font-bold" style={{ color: "#4E8A1A" }}>6th semester at BEC (Information Science)</span>.
             </p>
-            <p className="text-[#111111]/55 leading-relaxed">
-              I build production-grade systems — from AI-integrated platforms to
-              robust financial tools. I care about the entire stack: architecting
-              databases, designing clean APIs, and crafting pixel-perfect UIs.
+            <p className="text-[#111111]/55 leading-[1.78] text-[0.98rem]">
+              I build production-grade systems — from AI-integrated platforms to robust financial
+              tools. I care about the entire stack: architecting databases, designing clean APIs,
+              and crafting pixel-perfect UIs that users actually enjoy using.
             </p>
-            <p className="text-[#111111]/55 leading-relaxed">
+            <p className="text-[#111111]/55 leading-[1.78] text-[0.98rem]">
               Currently exploring{" "}
-              <span className="font-semibold text-[#111111]">
-                AI agents and intelligent automation
-              </span>{" "}
-              — integrating LLMs into real products that people actually use.
+              <span className="font-semibold text-[#111111]">AI agents and intelligent automation</span>
+              {" "}— contributing to GSSoC &amp; SSoC 2026 while integrating LLMs into real products.
             </p>
-            <div className="pt-2 inline-flex items-center gap-2 text-sm text-[#111111]/40">
-              🎓 {personalInfo.education}
+            {/* Edu chip */}
+            <div className="pt-2 inline-flex items-center gap-2.5 bg-black/[0.05] border border-black/[0.08] rounded-full px-4 py-2.5 text-sm text-[#111111]/52">
+              <span>🎓</span>
+              <span>{personalInfo.education}</span>
             </div>
-          </motion.div>
-
-          {/* Right — fact list */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.62, duration: 0.65 }}
-          >
-            {facts.map((item, i) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0 }}
-                animate={inView ? { opacity: 1 } : {}}
-                transition={{ delay: 0.7 + i * 0.1 }}
-                className="flex items-center justify-between py-5 border-b border-black/[0.08] group"
+            {/* View work button */}
+            <div className="pt-4">
+              <button
+                onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
+                className="btn-dark"
               >
-                <span className="text-[#111111]/35 text-[10px] uppercase tracking-[0.15em]">
-                  {item.label}
-                </span>
-                <span className="text-[#111111] font-semibold text-sm group-hover:text-[#7fb069] transition-colors duration-200">
+                View Work <ArrowUpRight size={16} />
+              </button>
+            </div>
+          </div>
+
+          {/* Facts */}
+          <div ref={factsRef}>
+            {facts.map((item) => (
+              <div
+                key={item.label}
+                className="fact-item flex items-center justify-between py-5 border-b border-black/[0.08] group"
+                style={{ opacity: 0 }}
+              >
+                <span className="section-label-light">{item.label}</span>
+                <span className="text-[#111111] font-semibold text-sm group-hover:text-[#4E8A1A] transition-colors duration-200 text-right max-w-[60%]">
                   {item.value}
                 </span>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
