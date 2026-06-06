@@ -53,12 +53,12 @@ export default function Skills() {
   return (
     <section id="skills" ref={sectionRef} className="bg-[#F4F4F0] text-[#000] overflow-hidden dot-pattern">
       {/* Label */}
-      <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-5 border-b border-black/[0.08]" style={{ opacity: 0 }}>
+      <div ref={labelRef} className="flex items-center justify-between px-6 md:px-10 lg:px-[8vw] py-5 border-b border-black/[0.08]" style={{ opacity: 0 }}>
         <span className="section-label-light">Stack</span>
         <span className="text-[#111111]/22 text-[10px] font-mono-custom">06</span>
       </div>
 
-      <div className="px-[5vw] py-28 md:py-40">
+      <div className="px-6 md:px-10 lg:px-[8vw] py-28 md:py-40">
         {/* Headline */}
         <div ref={headRef} className="overflow-hidden mb-20 md:mb-24">
           <h2

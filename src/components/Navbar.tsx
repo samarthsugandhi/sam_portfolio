@@ -97,7 +97,7 @@ export default function Navbar() {
       <nav
         ref={navRef}
         className={[
-          "fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-[5vw] transition-all duration-300",
+          "fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 lg:px-[8vw] transition-all duration-300",
           scrolled ? "navbar-glass h-[64px]" : "h-[72px]",
         ].join(" ")}
         style={{ opacity: 0 }}

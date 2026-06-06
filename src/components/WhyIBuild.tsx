@@ -86,7 +86,7 @@ export default function WhyIBuild() {
     <section id="why" ref={containerRef}>
       {/* Label */}
       <div className="bg-[#000000] border-t border-white/[0.12]">
-        <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-6 border-b border-white/[0.12]" style={{ opacity: 0 }}>
+        <div ref={labelRef} className="flex items-center justify-between px-6 md:px-10 lg:px-[8vw] py-6 border-b border-white/[0.12]" style={{ opacity: 0 }}>
           <span className="section-label-dark">What I Do</span>
           <span className="text-white/25 text-[12px] font-mono-custom">03</span>
         </div>
@@ -106,7 +106,7 @@ export default function WhyIBuild() {
 
           <div
             ref={(el) => { blockRefs.current[i] = el!; }}
-            className="px-[5vw] py-28 md:py-40 grid md:grid-cols-[1fr_1.5fr] gap-16 md:gap-24 items-start relative z-10"
+            className="px-6 md:px-10 lg:px-[8vw] py-28 md:py-40 grid md:grid-cols-[1fr_1.5fr] gap-16 md:gap-24 items-start relative z-10"
           >
             {/* Left */}
             <div>

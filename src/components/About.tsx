@@ -54,12 +54,12 @@ export default function About() {
   return (
     <section id="about" ref={sectionRef} className="bg-[#F2EFE8] text-[#111111] overflow-hidden dot-pattern">
       {/* Label */}
-      <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-5 border-b border-black/[0.08]" style={{ opacity: 0 }}>
+      <div ref={labelRef} className="flex items-center justify-between px-6 md:px-10 lg:px-[8vw] py-5 border-b border-black/[0.08]" style={{ opacity: 0 }}>
         <span className="section-label-light">About</span>
         <span className="text-[#111111]/22 text-[10px] font-mono-custom">02</span>
       </div>
 
-      <div className="px-[5vw] py-28 md:py-40">
+      <div className="px-6 md:px-10 lg:px-[8vw] py-28 md:py-40">
         {/* Headline */}
         <div ref={headRef} className="mb-24 md:mb-32">
           {headLines.map((line, i) => (

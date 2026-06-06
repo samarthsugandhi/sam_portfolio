@@ -70,12 +70,12 @@ export default function CurrentlyBuilding() {
   return (
     <section ref={sectionRef} id="currently-building" className="bg-[#000000] border-t border-white/[0.12] pt-12 pb-20 relative z-20 shadow-[0_-20px_50px_rgba(0,0,0,0.8)]">
       {/* Label */}
-      <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-6 border-b border-white/[0.12]" style={{ opacity: 0 }}>
+      <div ref={labelRef} className="flex items-center justify-between px-6 md:px-10 lg:px-[8vw] py-6 border-b border-white/[0.12]" style={{ opacity: 0 }}>
         <span className="section-label-dark">Currently</span>
         <span className="text-white/25 text-[12px] font-mono-custom">04</span>
       </div>
 
-      <div className="px-[5vw] py-28 md:py-40">
+      <div className="px-6 md:px-10 lg:px-[8vw] py-28 md:py-40">
         {/* Status tag */}
         <div ref={tagRef} className="flex items-center gap-3 mb-24" style={{ opacity: 0 }}>
           <span className="w-2.5 h-2.5 bg-[#D4FF00] animate-pulse flex-shrink-0" />

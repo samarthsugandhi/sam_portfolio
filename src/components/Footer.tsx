@@ -80,7 +80,7 @@ export default function Footer() {
       {/* ── Bottom bar ──────────────────────────────────────────── */}
       <div
         ref={bottomRef}
-        className="px-[5vw] py-10 border-t border-white/[0.05] flex flex-col md:flex-row items-start md:items-center justify-between gap-10"
+        className="px-6 md:px-10 lg:px-[8vw] py-10 border-t border-white/[0.05] flex flex-col md:flex-row items-start md:items-center justify-between gap-10"
         style={{ opacity: 0 }}
       >
         {/* Email + location */}
@@ -120,7 +120,7 @@ export default function Footer() {
       </div>
 
       {/* Copyright */}
-      <div className="px-[5vw] pb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="px-6 md:px-10 lg:px-[8vw] pb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <p className="text-white/20 text-[11px] font-mono-custom uppercase tracking-widest">
           ©{new Date().getFullYear()} {personalInfo.name}. All Rights Reserved.
         </p>

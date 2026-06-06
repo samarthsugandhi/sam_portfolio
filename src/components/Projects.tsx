@@ -67,13 +67,13 @@ export default function Projects() {
       onMouseMove={onMove}
     >
       {/* Label */}
-      <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-6 border-b border-white/[0.12]" style={{ opacity: 0 }}>
+      <div ref={labelRef} className="flex items-center justify-between px-6 md:px-10 lg:px-[8vw] py-6 border-b border-white/[0.12]" style={{ opacity: 0 }}>
         <span className="section-label-dark">Selected Works</span>
         <span className="text-white/25 text-[12px] font-mono-custom">05</span>
       </div>
 
       {/* Headline */}
-      <div ref={headRef} className="px-[5vw] pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
+      <div ref={headRef} className="px-6 md:px-10 lg:px-[8vw] pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
         <div className="overflow-hidden">
           <h2
             className="head-line font-display text-[#EFEFEF] uppercase leading-none block"
@@ -105,7 +105,7 @@ export default function Projects() {
             ref={(el) => { rowsRef.current[i] = el!; }}
             onMouseEnter={() => setHovered(project.id)}
             onMouseLeave={() => setHovered(null)}
-            className="group flex flex-col md:flex-row md:items-center gap-4 px-[5vw] py-12 md:py-16 border-b border-white/[0.12] hover:bg-white/[0.04] transition-colors duration-300 cursor-pointer"
+            className="group flex flex-col md:flex-row md:items-center gap-4 px-6 md:px-10 lg:px-[8vw] py-12 md:py-16 border-b border-white/[0.12] hover:bg-white/[0.04] transition-colors duration-300 cursor-pointer"
             style={{ opacity: 0 }}
           >
             {/* Index */}

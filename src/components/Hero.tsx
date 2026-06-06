@@ -68,7 +68,7 @@ export default function Hero() {
         }}
       />
 
-      <div className="px-[5vw] relative z-10 w-full mb-16 md:mb-24">
+      <div className="px-6 md:px-10 lg:px-[8vw] relative z-10 w-full mb-16 md:mb-24">
         {/* Info header */}
         <div ref={infoRef} className="flex items-center gap-4 mb-10 md:mb-14" style={{ opacity: 0 }}>
           <div className="w-2.5 h-2.5 bg-[#D4FF00] animate-pulse" />
@@ -105,7 +105,7 @@ export default function Hero() {
       {/* CTA */}
       <div
         ref={ctaRef}
-        className="absolute bottom-16 md:bottom-24 left-0 right-0 px-[5vw] flex flex-col md:flex-row items-start md:items-center justify-between gap-10"
+        className="absolute bottom-16 md:bottom-24 left-0 right-0 px-6 md:px-10 lg:px-[8vw] flex flex-col md:flex-row items-start md:items-center justify-between gap-10"
         style={{ opacity: 0 }}
       >
         <div className="flex gap-4">

@@ -69,12 +69,12 @@ export default function Contact() {
 
       {/* ── Dark CTA block ─────────────────────────────────── */}
       <div className="bg-[#000000] border-t border-white/[0.12]">
-        <div ref={labelRef} className="flex items-center justify-between px-[5vw] py-5 border-b border-white/[0.07]" style={{ opacity: 0 }}>
+        <div ref={labelRef} className="flex items-center justify-between px-6 md:px-10 lg:px-[8vw] py-5 border-b border-white/[0.07]" style={{ opacity: 0 }}>
           <span className="section-label-dark">Contact</span>
           <span className="text-white/18 text-[10px] font-mono-custom">08</span>
         </div>
 
-        <div className="px-[5vw] py-28 md:py-40 grid md:grid-cols-2 gap-20 md:gap-28 items-end">
+        <div className="px-6 md:px-10 lg:px-[8vw] py-28 md:py-40 grid md:grid-cols-2 gap-20 md:gap-28 items-end">
           {/* Headline */}
           <div ref={headRef}>
             <div className="overflow-hidden">
@@ -125,7 +125,7 @@ export default function Contact() {
 
       {/* ── Social links bar ───────────────────────────────── */}
       <div className="bg-[#F4F4F0] border-t border-black/[0.12]">
-        <div ref={linksRef} className="px-[5vw] py-7 flex flex-wrap items-center justify-between gap-4" style={{ opacity: 0 }}>
+        <div ref={linksRef} className="px-6 md:px-10 lg:px-[8vw] py-7 flex flex-wrap items-center justify-between gap-4" style={{ opacity: 0 }}>
           <p className="text-[#111111]/40 text-sm">Connect with me</p>
           <div className="flex flex-wrap items-center gap-6">
             {[
@@ -148,7 +148,7 @@ export default function Contact() {
       </div>
 
       {/* ── Contact form ────────────────────────────────────── */}
-      <div className="bg-[#F4F4F0] px-[5vw] py-28 md:py-40 border-t border-black/[0.12]">
+      <div className="bg-[#F4F4F0] px-6 md:px-10 lg:px-[8vw] py-28 md:py-40 border-t border-black/[0.12]">
         <div ref={formRef} className="max-w-2xl" style={{ opacity: 0 }}>
           <div className="overflow-hidden mb-16 md:mb-20">
             <h3
