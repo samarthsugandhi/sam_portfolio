@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Activity — Samarth Sugandhi</title>
+    <meta name="description" content="Samarth Sugandhi's GitHub activity — real repositories, contributions, and engineering evidence.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="detail-style.css">
+    <style>
+        /* ── GitHub-page-specific styles ── */
+        .gh-profile-strip {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            background: var(--graphite);
+            border: 1px solid var(--seam);
+            padding: 36px 40px;
+            margin-bottom: 2px;
+        }
+
+        .gh-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 2px solid var(--steel);
+            overflow: hidden;
+            flex-shrink: 0;
+            background: var(--surface);
+        }
+        .gh-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gh-profile-info {}
+        .gh-profile-name {
+            font-family: var(--font-display);
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            text-transform: uppercase;
+            color: var(--off-white);
+            line-height: 1;
+            margin-bottom: 6px;
+            letter-spacing: -0.01em;
+        }
+        .gh-profile-handle {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+        .gh-profile-bio {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: rgba(240,237,232,0.4);
+            line-height: 1.6;
+        }
+
+        .gh-profile-link {
+            margin-left: auto;
+        }
+
+        /* ── Repo list ── */
+        .repo-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-bottom: 56px;
+        }
+
+        .repo-card {
+            background: var(--graphite);
+            border: 1px solid var(--seam);
+            padding: 28px 32px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+            align-items: start;
+            text-decoration: none;
+            transition: border-color 0.25s, background 0.25s;
+        }
+        .repo-card:hover {
+            border-color: var(--steel);
+            background: var(--surface);
+        }
+
+        .repo-card__name {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--off-white);
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .repo-card__desc {
+            font-family: var(--font-mono);
+            font-size: 0.63rem;
+            color: rgba(240,237,232,0.4);
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .repo-card__meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .repo-card__tag {
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            letter-spacing: 0.12em;
+            color: var(--steel);
+            text-transform: uppercase;
+        }
+        .repo-card__tag--lang { color: var(--ash); }
+
+        .repo-arrow {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--steel);
+            margin-top: 4px;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .repo-card:hover .repo-arrow {
+            color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        @media (max-width: 600px) {
+            .gh-profile-strip { flex-direction: column; align-items: flex-start; }
+            .gh-profile-link { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <a href="index.html" class="back-btn" aria-label="Back to home">
+            <svg viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M13 7H1M6 2L1 7l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg>
+            Back
+        </a>
+        <div class="page-header__identity">Samarth Sugandhi</div>
+    </header>
+
+    <main class="detail-page">
+        <div class="detail-page__hero">
+            <div class="detail-page__bg" style="background-image:url('images/bg-github.jpg')"></div>
+            <div class="detail-page__bg-overlay"></div>
+            <div class="detail-page__hero-content">
+                <p class="detail-page__label">05 / 05 — Engineering Activity</p>
+                <h1 class="detail-page__title">GitHub</h1>
+                <p class="detail-page__subtitle">
+                    Real code. Real commits. Evidence that the work actually happens.
+                </p>
+            </div>
+        </div>
+
+        <div class="detail-page__body">
+
+            <!-- LIVE STATS (populated by JS) -->
+            <div class="gh-stat-grid" id="gh-stats-grid">
+                <div class="gh-stat-card">
+                    <p class="gh-stat-card__value" id="stat-repos">—</p>
+                    <p class="gh-stat-card__label">Public Repos</p>
+                </div>
+                <div class="gh-stat-card">
+                    <p class="gh-stat-card__value" id="stat-followers">—</p>
+                    <p class="gh-stat-card__label">Followers</p>
+                </div>
+                <div class="gh-stat-card">
+                    <p class="gh-stat-card__value" id="stat-following">—</p>
+                    <p class="gh-stat-card__label">Following</p>
+                </div>
+                <div class="gh-stat-card">
+                    <p class="gh-stat-card__value" id="stat-gists">—</p>
+                    <p class="gh-stat-card__label">Public Gists</p>
+                </div>
+            </div>
+
+            <!-- PROFILE STRIP -->
+            <div class="gh-profile-strip">
+                <div class="gh-avatar">
+                    <img src="" alt="Samarth Sugandhi GitHub avatar" id="gh-avatar-img">
+                </div>
+                <div class="gh-profile-info">
+                    <p class="gh-profile-name">Samarth Sugandhi</p>
+                    <p class="gh-profile-handle">@samarthsugandhi</p>
+                    <p class="gh-profile-bio" id="gh-bio">Loading profile…</p>
+                </div>
+                <div class="gh-profile-link">
+                    <a href="https://github.com/samarthsugandhi" class="btn-outline" target="_blank" rel="noopener noreferrer">
+                        Open GitHub ↗
+                    </a>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- PINNED / RECENT REPOS -->
+            <div class="section-header">
+                <p class="section-label">Recent Repositories</p>
+                <h2 class="section-title">Latest Work</h2>
+            </div>
+
+            <div class="repo-list" id="repo-list">
+                <!-- Populated by JS; static fallback below if API fails -->
+                <p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--steel);padding:24px 0;">
+                    Loading repositories from GitHub…
+                </p>
+            </div>
+
+            <div class="view-more">
+                <a href="https://github.com/samarthsugandhi?tab=repositories" class="btn-outline"
+                   target="_blank" rel="noopener noreferrer">
+                    View All Repositories ↗
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+    (function () {
+        'use strict';
+
+        var GH_USER = 'samarthsugandhi';
+        var API_BASE = 'https://api.github.com';
+        var HEADERS  = { 'Accept': 'application/vnd.github.v3+json' };
+
+        function setText(id, val) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = val;
+        }
+
+        /* ── Profile ── */
+        fetch(API_BASE + '/users/' + GH_USER, { headers: HEADERS })
+            .then(function(r) { return r.json(); })
+            .then(function(u) {
+                setText('stat-repos',      u.public_repos  || '—');
+                setText('stat-followers',  u.followers     || '—');
+                setText('stat-following',  u.following     || '—');
+                setText('stat-gists',      u.public_gists  || '—');
+                setText('gh-bio',          u.bio || 'Software engineer. Builder.');
+
+                var avatar = document.getElementById('gh-avatar-img');
+                if (avatar && u.avatar_url) {
+                    avatar.src = u.avatar_url;
+                }
+            })
+            .catch(function() {
+                setText('gh-bio', 'Software engineer. Builder.');
+            });
+
+        /* ── Repos ── */
+        fetch(API_BASE + '/users/' + GH_USER + '/repos?sort=pushed&per_page=8', { headers: HEADERS })
+            .then(function(r) { return r.json(); })
+            .then(function(repos) {
+                if (!Array.isArray(repos) || repos.length === 0) return;
+
+                var list = document.getElementById('repo-list');
+                if (!list) return;
+
+                list.innerHTML = '';
+                repos.forEach(function(repo) {
+                    if (repo.fork) return; /* skip forks */
+                    var card = document.createElement('a');
+                    card.href   = repo.html_url;
+                    card.target = '_blank';
+                    card.rel    = 'noopener noreferrer';
+                    card.className = 'repo-card';
+
+                    var updated = new Date(repo.pushed_at).toLocaleDateString('en-GB', {
+                        month: 'short', year: 'numeric'
+                    });
+
+                    card.innerHTML =
+                        '<div>' +
+                            '<p class="repo-card__name">' + (repo.name || '') + '</p>' +
+                            '<p class="repo-card__desc">' + (repo.description || 'No description.') + '</p>' +
+                            '<div class="repo-card__meta">' +
+                                (repo.language ? '<span class="repo-card__tag repo-card__tag--lang">' + repo.language + '</span>' : '') +
+                                '<span class="repo-card__tag">★ ' + (repo.stargazers_count || 0) + '</span>' +
+                                '<span class="repo-card__tag">Updated ' + updated + '</span>' +
+                            '</div>' +
+                        '</div>' +
+                        '<span class="repo-arrow">↗</span>';
+
+                    list.appendChild(card);
+                });
+
+                if (list.children.length === 0) {
+                    list.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--steel);padding:24px 0;">No public repositories found.</p>';
+                }
+            })
+            .catch(function() {
+                var list = document.getElementById('repo-list');
+                if (list) list.innerHTML = '<p style="font-family:var(--font-mono);font-size:0.65rem;color:var(--steel);padding:24px 0;">Could not load repositories. <a href="https://github.com/samarthsugandhi?tab=repositories" target="_blank" rel="noopener noreferrer" style="color:var(--accent);">View on GitHub ↗</a></p>';
+            });
+    })();
+    </script>
+</body>
+</html>
