@@ -11,6 +11,86 @@
 (function () {
     'use strict';
 
+    /* ================================================================
+       PRELOADER — Terminal Boot Screen
+       ================================================================ */
+    function initPreloader() {
+        var preloader = document.getElementById('preloader');
+        if (!preloader) return;
+
+        /* Skip on revisit within same session */
+        if (sessionStorage.getItem('ss_loaded')) {
+            preloader.style.display = 'none';
+            return;
+        }
+
+        var linesEl  = document.getElementById('preloader-lines');
+        var barEl    = document.getElementById('preloader-bar');
+        var pctEl    = document.getElementById('preloader-pct');
+        var readyEl  = document.getElementById('preloader-ready');
+
+        /* Boot sequence lines: [text, class-suffix, delay-ms, progress-%] */
+        var sequence = [
+            ['> Booting portfolio OS v2.0.26...',      'prompt', 0,    8 ],
+            ['> CPU: 12-core | RAM: 32 GB DDR5',       'dim',    260,  16],
+            ['> Mounting filesystem /dev/samarth...',  'prompt', 500,  25],
+            ['> Loading modules: projects ✓',          '',       780,  34],
+            ['> Loading modules: hackathons [4 wins]', '',       980,  43],
+            ['> Loading modules: journey ✓',           '',       1140, 52],
+            ['> Loading modules: engineering ✓',       '',       1290, 61],
+            ['> Loading modules: github-sync ✓',       '',       1430, 70],
+            ['> Running diagnostics... PASSED',        'ok',     1620, 82],
+            ['> Connecting to samarth.portfolio...',   'prompt', 1830, 92],
+            ['> Authentication: OK | ENV: PRODUCTION', 'ok',    2040, 100],
+        ];
+
+        /* Animate progress smoothly */
+        function setProgress(pct) {
+            barEl.style.width = pct + '%';
+            pctEl.textContent = pct + '%';
+        }
+
+        /* Append one line to the terminal */
+        function addLine(text, cls) {
+            var el = document.createElement('div');
+            el.className = 'preloader__line' + (cls ? ' preloader__line--' + cls : '');
+            el.textContent = text;
+            linesEl.appendChild(el);
+            /* Keep last lines visible — scroll terminal */
+            linesEl.scrollTop = linesEl.scrollHeight;
+        }
+
+        /* Schedule each boot line */
+        sequence.forEach(function (item) {
+            var text = item[0], cls = item[1], delay = item[2], pct = item[3];
+            setTimeout(function () {
+                addLine(text, cls);
+                setProgress(pct);
+            }, delay);
+        });
+
+        /* Show "SYSTEM READY" banner */
+        setTimeout(function () {
+            if (readyEl) {
+                readyEl.classList.add('preloader__ready--show');
+            }
+        }, 2300);
+
+        /* Dismiss the preloader */
+        setTimeout(function () {
+            preloader.classList.add('preloader--done');
+            sessionStorage.setItem('ss_loaded', '1');
+            /* Remove from DOM after transition ends */
+            preloader.addEventListener('transitionend', function () {
+                preloader.style.display = 'none';
+            }, { once: true });
+        }, 2900);
+    }
+
+    /* Run immediately — no need to wait for DOMContentLoaded
+       since the preloader element is the first thing in <body> */
+    initPreloader();
+
     /* ── GitHub API ── */
     const GH_USER = 'samarthsugandhi';
     const ghStat    = document.getElementById('gh-stat');

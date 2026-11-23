@@ -1934,6 +1934,231 @@ textarea.cform__input {
 }
 
 /* ================================================================
+   PRELOADER — Terminal Boot Screen
+   ================================================================ */
+
+.preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #0E0E0E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    /* Exit transition */
+    transition: opacity 0.7s cubic-bezier(0.76, 0, 0.24, 1),
+                visibility 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+}
+.preloader.preloader--done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Animated scan-line CRT effect */
+.preloader__scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.18) 2px,
+        rgba(0, 0, 0, 0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+    animation: scanMove 8s linear infinite;
+}
+@keyframes scanMove {
+    0%   { background-position: 0 0; }
+    100% { background-position: 0 100px; }
+}
+
+/* Corner frame brackets */
+.preloader__corner {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-color: #DFFF00;
+    border-style: solid;
+    opacity: 0.55;
+    pointer-events: none;
+    z-index: 2;
+}
+.preloader__corner--tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+.preloader__corner--tr { top: 20px; right: 20px; border-width: 2px 2px 0 0; }
+.preloader__corner--bl { bottom: 20px; left: 20px; border-width: 0 0 2px 2px; }
+.preloader__corner--br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+
+/* Inner container */
+.preloader__inner {
+    position: relative;
+    z-index: 3;
+    width: min(560px, 90vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+/* SS Monogram */
+.preloader__monogram {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(3.5rem, 10vw, 5.5rem);
+    color: #DFFF00;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-shadow:
+        0 0 24px rgba(223, 255, 0, 0.55),
+        0 0 60px rgba(223, 255, 0, 0.20);
+    animation: monogramPulse 2.4s ease-in-out infinite;
+}
+@keyframes monogramPulse {
+    0%, 100% { text-shadow: 0 0 24px rgba(223,255,0,0.55), 0 0 60px rgba(223,255,0,0.20); }
+    50%       { text-shadow: 0 0 40px rgba(223,255,0,0.90), 0 0 100px rgba(223,255,0,0.40); }
+}
+
+/* Terminal window */
+.preloader__terminal {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(223, 255, 0, 0.18);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(223, 255, 0, 0.06), inset 0 0 60px rgba(0,0,0,0.3);
+}
+
+/* macOS-style title bar */
+.preloader__terminal-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.preloader__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.preloader__dot--red    { background: #FF5F57; }
+.preloader__dot--yellow { background: #FFBD2E; }
+.preloader__dot--green  { background: #28C840; }
+.preloader__terminal-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.03em;
+    margin-left: 4px;
+}
+
+/* Terminal lines output */
+.preloader__lines {
+    padding: 16px 20px 8px;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.preloader__line {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.68rem, 1.4vw, 0.78rem);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.78);
+    white-space: pre-wrap;
+    word-break: break-word;
+    opacity: 0;
+    transform: translateY(4px);
+    animation: lineReveal 0.3s ease forwards;
+}
+.preloader__line--prompt { color: #DFFF00; }
+.preloader__line--ok     { color: #28C840; }
+.preloader__line--dim    { color: rgba(255, 255, 255, 0.42); }
+@keyframes lineReveal {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Blinking cursor */
+.preloader__cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: #DFFF00;
+    margin: 0 20px 14px;
+    vertical-align: middle;
+    animation: blink 0.8s step-start infinite;
+    border-radius: 1px;
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+/* Progress bar */
+.preloader__bar-wrap {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.preloader__bar-track {
+    flex: 1;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+.preloader__bar {
+    height: 100%;
+    width: 0%;
+    background: #DFFF00;
+    border-radius: 2px;
+    transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 0 10px rgba(223, 255, 0, 0.6);
+}
+.preloader__bar-pct {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.68rem;
+    color: rgba(223, 255, 0, 0.75);
+    min-width: 36px;
+    text-align: right;
+    letter-spacing: 0.03em;
+}
+
+/* "SYSTEM READY" flash at end */
+.preloader__ready {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    color: #DFFF00;
+    letter-spacing: 0.18em;
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    text-shadow: 0 0 30px rgba(223, 255, 0, 0.6);
+    pointer-events: none;
+}
+.preloader__ready--show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Mobile tweaks */
+@media (max-width: 500px) {
+    .preloader__corner { width: 20px; height: 20px; }
+    .preloader__corner--tl, .preloader__corner--tr { top: 12px; }
+    .preloader__corner--bl, .preloader__corner--br { bottom: 12px; }
+    .preloader__corner--tl, .preloader__corner--bl { left: 12px; }
+    .preloader__corner--tr, .preloader__corner--br { right: 12px; }
+    .preloader__inner { gap: 18px; }
+    .preloader__lines { min-height: 90px; }
+}
+
+/* ================================================================
    REDUCED MOTION
    ================================================================ */
 @media (prefers-reduced-motion: reduce) {

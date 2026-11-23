@@ -13,6 +13,47 @@
 </head>
 <body>
 
+    <!-- ============================================================
+         PRELOADER — Terminal Boot Screen
+         ============================================================ -->
+    <div id="preloader" class="preloader" aria-hidden="true" role="status" aria-label="Loading portfolio">
+        <!-- Scan-line overlay -->
+        <div class="preloader__scanlines" aria-hidden="true"></div>
+        <!-- Corner brackets -->
+        <div class="preloader__corner preloader__corner--tl" aria-hidden="true"></div>
+        <div class="preloader__corner preloader__corner--tr" aria-hidden="true"></div>
+        <div class="preloader__corner preloader__corner--bl" aria-hidden="true"></div>
+        <div class="preloader__corner preloader__corner--br" aria-hidden="true"></div>
+
+        <div class="preloader__inner">
+            <!-- Monogram -->
+            <div class="preloader__monogram" aria-hidden="true">SS</div>
+
+            <!-- Terminal window -->
+            <div class="preloader__terminal" aria-label="Terminal boot sequence">
+                <div class="preloader__terminal-bar" aria-hidden="true">
+                    <span class="preloader__dot preloader__dot--red"></span>
+                    <span class="preloader__dot preloader__dot--yellow"></span>
+                    <span class="preloader__dot preloader__dot--green"></span>
+                    <span class="preloader__terminal-title">boot.sh — samarth@portfolio</span>
+                </div>
+                <div class="preloader__lines" id="preloader-lines" aria-live="polite"></div>
+                <span class="preloader__cursor" aria-hidden="true"></span>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="preloader__bar-wrap" aria-hidden="true">
+                <div class="preloader__bar-track">
+                    <div class="preloader__bar" id="preloader-bar"></div>
+                </div>
+                <span class="preloader__bar-pct" id="preloader-pct">0%</span>
+            </div>
+
+            <!-- Ready label (shown at end) -->
+            <div class="preloader__ready" id="preloader-ready" aria-hidden="true">SYSTEM READY</div>
+        </div>
+    </div>
+
     <!-- Global Header -->
     <header class="global-header" role="banner">
         <div class="header__identity">
