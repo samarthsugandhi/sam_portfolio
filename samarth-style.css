@@ -538,19 +538,22 @@ article.panel:focus-visible .details > .btn-cta {
     outline: none;
 }
 
-/* Resume — filled lime, no glow */
+/* Resume — filled lime, bold carbon black text */
+.nav__link.nav__link--accent,
 .nav__link--accent {
-    color: var(--carbon);
-    background: var(--accent);
-    border-color: var(--accent);
-    font-weight: 700;
-    opacity: 1;
+    color: #0E0E0E !important;
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
 }
+.nav__link.nav__link--accent:hover,
+.nav__link.nav__link--accent:focus-visible,
 .nav__link--accent:hover,
 .nav__link--accent:focus-visible {
-    color: var(--carbon);
-    background: #FFFFFF;
-    border-color: #FFFFFF;
+    color: #0E0E0E !important;
+    background: #FFFFFF !important;
+    border-color: #FFFFFF !important;
 }
 
 /* ================================================================
@@ -859,65 +862,139 @@ article.panel:nth-child(5) .spine--vertical { animation-delay: 0.84s; }
     }
 }
 
+/* Mobile dot indicators — hidden on desktop, shown via mobile media query */
+.mobile-dots { display: none; }
+.swipe-hint  { display: none; }
+
 /* ================================================================
-   RESPONSIVE — ≤960px: stacked layout (mobile + tablet portrait)
+   RESPONSIVE — ≤960px: CINEMATIC HORIZONTAL SNAP (mobile + tablet)
+   ================================================================
+   Each panel occupies 100vw × 100dvh. Swipe left/right to navigate.
+   Five dot indicators + swipe hint overlay for a premium app feel.
    ================================================================ */
 @media (max-width: 960px) {
+
+    /* ── Root overrides ── */
     :root {
-        --header-h: 58px;
+        --header-h: 54px;
         --footer-h: 0px;
     }
 
-    main.track {
-        flex-direction: column;
-        height: auto;
-        min-height: 100vh;
-        overflow-y: auto;
+    /* Lock body to viewport — no page scroll on mobile */
+    body {
+        overflow: hidden;
+        height: 100dvh;
+        height: 100vh; /* fallback */
     }
 
+    /* ── Horizontal scroll-snap track ── */
+    main.track {
+        flex-direction: row !important;
+        height: calc(100dvh - var(--header-h));
+        height: calc(100vh - var(--header-h)); /* fallback */
+        width: 100vw;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 0;
+    }
+
+    main.track::-webkit-scrollbar { display: none; }
+
+    /* ── Each panel = one full "page" ── */
     article.panel {
         flex: none !important;
-        width: 100%;
-        height: 52vh;
-        min-height: 260px;
+        width: 100vw !important;
+        height: calc(100dvh - var(--header-h)) !important;
+        height: calc(100vh - var(--header-h)) !important; /* fallback */
+        min-height: unset;
         border-right: none;
-        border-bottom: 1px solid rgba(17,17,17,0.6);
+        border-bottom: none;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
         animation: none;
         opacity: 1;
         transform: none;
+        cursor: default;
     }
 
-    article.panel:last-child { border-bottom: none; }
-
-    /* Brighter on mobile (no hover state) */
+    /* ── Background — brighter, more cinematic on mobile ── */
     .panel__bg img {
-        filter: brightness(0.42) saturate(0.65) !important;
+        filter: brightness(0.52) saturate(0.80) contrast(1.05) !important;
         transform: scale(1) !important;
+        object-fit: cover;
+        object-position: center;
     }
 
-    /* Hide spine-wrapper (vertical text) — not needed on mobile */
+    /* Richer gradient overlay — darken bottom for text legibility */
+    .panel__overlay {
+        background: linear-gradient(
+            to top,
+            rgba(0,0,0,0.88) 0%,
+            rgba(0,0,0,0.42) 45%,
+            rgba(0,0,0,0.12) 100%
+        ) !important;
+    }
+
+    /* ── Big ghost panel number — cinematic depth element ── */
+    .panel__index {
+        top: unset;
+        bottom: 0;
+        right: -0.08em;
+        left: unset;
+        font-family: var(--font-display);
+        font-size: clamp(14rem, 42vw, 24rem);
+        font-weight: 800;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255,255,255,0.055);
+        text-stroke: 1px rgba(255,255,255,0.055);
+        letter-spacing: -0.04em;
+        line-height: 0.78;
+        opacity: 1 !important;
+        pointer-events: none;
+        z-index: 1;
+        /* Show only the leading digit/digits (truncate at right edge is fine) */
+    }
+
+    /* ── Spine — hide vertical, show horizontal (always visible) ── */
     .spine-wrapper { display: none; }
 
-    /* panel__expanded stays but uses simple anchoring */
-    .panel__expanded {
-        left: 20px;
-        right: 20px;
-        bottom: 22px;
-        max-width: 100%;
-        pointer-events: none; /* children override via details > * rule */
-    }
-
-    /* Horizontal spine hidden on mobile */
-    .spine--horizontal { display: none; }
-
-    .panel__index {
-        top: 14px;
-        opacity: 0.75 !important;
-        font-size: 0.52rem;
+    .spine--horizontal {
+        display: block !important;
+        opacity: 1 !important;
+        transform: none !important;
+        font-size: clamp(2.6rem, 9vw, 4.8rem);
+        letter-spacing: -0.02em;
         color: #FFFFFF;
+        line-height: 1;
+        margin-top: 0;
     }
 
-    /* Details always visible on mobile */
+    /* ── Content anchored to lower-left of each panel ── */
+    .panel__expanded {
+        position: absolute;
+        left: clamp(22px, 6vw, 48px);
+        right: clamp(22px, 6vw, 48px);
+        bottom: clamp(52px, 10vh, 90px); /* clear the dot indicators */
+        top: unset;
+        max-width: 540px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    /* ── Details content — always visible ── */
+    .details {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 14px;
+    }
+
     .details > * {
         opacity: 1 !important;
         transform: translateY(0) !important;
@@ -930,89 +1007,196 @@ article.panel:nth-child(5) .spine--vertical { animation-delay: 0.84s; }
     .details > .btn-cta {
         opacity: 1 !important;
         transform: translateY(0) !important;
+        pointer-events: auto !important;
+    }
+
+    .details__eyebrow {
+        font-size: 0.58rem;
+        letter-spacing: 0.28em;
+        color: var(--accent);
+        margin-bottom: 8px;
     }
 
     .details__stat {
-        font-size: 0.66rem;
-        margin-bottom: 12px;
-        color: rgba(255, 255, 255, 0.88);
-    }
-    .details__description {
-        font-size: 0.85rem;
-        line-height: 1.6;
-        color: #FFFFFF;
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        margin-bottom: 10px;
+        color: rgba(255, 255, 255, 0.90);
     }
 
+    .details__description {
+        display: block !important; /* restore — was hidden at 768px */
+        font-size: 0.88rem;
+        line-height: 1.65;
+        color: #FFFFFF;
+        margin-bottom: 14px;
+        max-width: 42ch;
+    }
+
+    .details__tags {
+        margin-bottom: 18px;
+        gap: 6px;
+    }
+
+    .details__tag {
+        font-size: 0.58rem;
+        padding: 4px 10px;
+        color: rgba(255,255,255,0.90);
+        border-color: rgba(255,255,255,0.28);
+    }
+
+    .btn-cta {
+        font-size: 0.60rem;
+        padding: 10px 20px;
+        letter-spacing: 0.18em;
+        pointer-events: auto;
+    }
+
+    /* ── Header ── */
     .global-header {
-        padding: 0 18px;
+        padding: 0 20px;
         height: var(--header-h);
         align-items: center;
+        position: relative;
+        z-index: 100;
     }
 
     .header__role { display: none; }
     .global-footer { display: none; }
 
-    .nav { gap: 1px; }
+    .nav { gap: 0; }
     .nav__link {
-        padding: 6px 10px;
-        font-size: 0.53rem;
+        padding: 6px 9px;
+        font-size: 0.52rem;
         color: rgba(255, 255, 255, 0.85);
     }
-
-    body {
-        overflow-y: auto;
-        overflow-x: hidden;
-        height: auto;
+    .nav__link--accent {
+        color: #0E0E0E !important;
+        background: var(--accent) !important;
+        font-weight: 700 !important;
     }
 
+    /* ── Modal adjustments ── */
     .modal__content { padding: 36px 22px; }
     .modal__contact-grid { grid-template-columns: 1fr; }
     .modal-overlay { align-items: flex-start; }
     .modal__content {
-        max-height: 100vh;
+        max-height: 92dvh;
+        max-height: 92vh;
         margin-top: 40px;
         padding-bottom: 60px;
+        overflow-y: auto;
     }
     .modal__close { top: 18px; right: 20px; }
-}
 
-/* ================================================================
-   RESPONSIVE — 768px tablet portrait
-   ================================================================ */
-@media (max-width: 768px) {
-    article.panel {
-        height: 48vh;
-        min-height: 240px;
+    /* ── Mobile dot indicators ── */
+    .mobile-dots {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        z-index: 200;
+        pointer-events: none;
     }
 
-    .details__description { display: none; }
-    .details__tags { margin-bottom: 16px; }
+    .mobile-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.35);
+        transition: background 0.35s var(--ease-out), width 0.35s var(--ease-out), border-radius 0.35s var(--ease-out);
+        display: block;
+    }
 
-    .nav__link { font-size: 0.51rem; padding: 5px 8px; }
+    .mobile-dot.is-active {
+        width: 20px;
+        border-radius: 3px;
+        background: var(--accent);
+    }
+
+    /* ── Swipe hint (first panel only) ── */
+    .swipe-hint {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        position: absolute;
+        right: clamp(20px, 5vw, 40px);
+        bottom: clamp(52px, 10vh, 90px);
+        font-family: var(--font-mono);
+        font-size: 0.52rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.55);
+        pointer-events: none;
+        z-index: 20;
+        animation: hintPulse 2.4s var(--ease-out) 1.6s 3 forwards;
+    }
+
+    .swipe-hint__arrow {
+        display: flex;
+        gap: 2px;
+        animation: hintSlide 1.2s var(--ease-out) 1.6s infinite;
+    }
+
+    @keyframes hintSlide {
+        0%   { transform: translateX(0);   opacity: 0.55; }
+        50%  { transform: translateX(6px); opacity: 1; }
+        100% { transform: translateX(0);   opacity: 0.55; }
+    }
+
+    @keyframes hintPulse {
+        0%   { opacity: 0; }
+        10%  { opacity: 1; }
+        80%  { opacity: 1; }
+        100% { opacity: 0; pointer-events: none; }
+    }
+
+    /* Panel-number counter overlay — panel-specific accent line */
+    .panel__expanded::before {
+        content: '';
+        display: block;
+        width: 28px;
+        height: 2px;
+        background: var(--accent);
+        margin-bottom: 16px;
+        flex-shrink: 0;
+    }
 }
 
 /* ================================================================
-   RESPONSIVE — 430px / 390px mobile
+   RESPONSIVE — 500px / 390px narrow phones
    ================================================================ */
 @media (max-width: 500px) {
-    article.panel {
-        height: 46vh;
-        min-height: 220px;
-    }
-
     .panel__expanded {
-        left: 16px;
-        right: 16px;
+        left: 20px;
+        right: 20px;
+        bottom: 50px;
     }
 
     .header__name {
-        font-size: 0.58rem;
-        letter-spacing: 0.16em;
+        font-size: 0.57rem;
+        letter-spacing: 0.15em;
     }
 
     .nav__link--accent {
-        font-size: 0.5rem;
-        padding: 5px 9px;
+        color: #0E0E0E !important;
+        background: var(--accent) !important;
+        font-weight: 700 !important;
+        font-size: 0.63rem;
+        padding: 7px 13px;
+        letter-spacing: 0.16em;
+    }
+
+    .spine--horizontal {
+        font-size: clamp(2.2rem, 10vw, 3.6rem);
+    }
+
+    .mobile-dots {
+        bottom: 14px;
     }
 }
 

@@ -283,38 +283,72 @@
         });
     }
 
-    /* ── Mobile: scroll reveal ── */
-    function initScrollReveal() {
-        if (window.innerWidth > 960) return;
+    /* ── Mobile: horizontal snap dot indicators + panel tracking ── */
+    function initMobile() {
+        var isMobile = window.innerWidth <= 960;
+        var track = document.querySelector('main.track');
+        var mobileDots = document.getElementById('mobile-dots');
+        var dots = mobileDots ? mobileDots.querySelectorAll('.mobile-dot') : [];
+        var panels = document.querySelectorAll('article.panel');
 
-        var mobilePanels = document.querySelectorAll('article.panel');
-        mobilePanels.forEach(function (panel) {
-            panel.style.opacity = '0';
-            panel.style.transform = 'translateY(18px)';
-            panel.style.transition = 'opacity 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        /* Hide dots entirely on desktop */
+        if (mobileDots) {
+            mobileDots.style.display = isMobile ? 'flex' : 'none';
+        }
+
+        if (!isMobile || !track) return;
+
+        /* Disable the click-based panel-expand animation on mobile
+           (panels are full-screen; CTA buttons handle navigation) */
+        panels.forEach(function (panel) {
+            panel.style.cursor = 'default';
         });
 
-        if ('IntersectionObserver' in window) {
+        /* IntersectionObserver on the horizontal scroll track */
+        if ('IntersectionObserver' in window && dots.length > 0) {
+            var options = {
+                root: track,
+                threshold: 0.5
+            };
+
             var observer = new IntersectionObserver(function (entries) {
                 entries.forEach(function (entry) {
                     if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                        observer.unobserve(entry.target);
+                        var panelIndex = Array.prototype.indexOf.call(panels, entry.target);
+                        dots.forEach(function (dot, i) {
+                            dot.classList.toggle('is-active', i === panelIndex);
+                        });
+
+                        /* Update footer panel indicator if visible */
+                        var footerIndicator = document.getElementById('footer-panel');
+                        if (footerIndicator) {
+                            var num = entry.target.dataset.panel || (panelIndex + 1);
+                            footerIndicator.textContent = num + ' / 05';
+                        }
                     }
                 });
-            }, { threshold: 0.1 });
+            }, options);
 
-            mobilePanels.forEach(function (panel) { observer.observe(panel); });
-        } else {
-            /* Fallback */
-            mobilePanels.forEach(function (panel) {
-                panel.style.opacity = '1';
-                panel.style.transform = 'translateY(0)';
-            });
+            panels.forEach(function (panel) { observer.observe(panel); });
         }
+
+        /* Entrance animation — panels slide in from right on load */
+        panels.forEach(function (panel, i) {
+            panel.style.opacity = '0';
+            panel.style.transform = 'translateX(28px)';
+            panel.style.transition = 'opacity 0.6s cubic-bezier(0.25,0.46,0.45,0.94) ' + (i * 0.07) + 's, transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94) ' + (i * 0.07) + 's';
+        });
+
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                panels.forEach(function (panel) {
+                    panel.style.opacity = '1';
+                    panel.style.transform = 'translateX(0)';
+                });
+            });
+        });
     }
 
-    document.addEventListener('DOMContentLoaded', initScrollReveal);
+    document.addEventListener('DOMContentLoaded', initMobile);
 
 })();
