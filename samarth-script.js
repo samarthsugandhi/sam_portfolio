@@ -349,6 +349,69 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', initMobile);
+    /* ── Mobile Menu Controller ── */
+    function initMobileMenu() {
+        var menuToggle = document.getElementById('menu-toggle');
+        var mobileMenu = document.getElementById('mobile-menu');
+        var menuClose = document.getElementById('menu-close');
+        var menuBackdrop = document.getElementById('menu-backdrop');
+
+        if (!menuToggle || !mobileMenu) return;
+
+        function openMenu() {
+            mobileMenu.classList.add('is-active');
+            mobileMenu.setAttribute('aria-hidden', 'false');
+            menuToggle.classList.add('is-open');
+            menuToggle.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeMenu() {
+            mobileMenu.classList.remove('is-active');
+            mobileMenu.setAttribute('aria-hidden', 'true');
+            menuToggle.classList.remove('is-open');
+            menuToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        menuToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            if (mobileMenu.classList.contains('is-active')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        if (menuClose) {
+            menuClose.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeMenu();
+            });
+        }
+
+        if (menuBackdrop) {
+            menuBackdrop.addEventListener('click', function () {
+                closeMenu();
+            });
+        }
+
+        /* Close menu smoothly on clicking any link */
+        mobileMenu.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                closeMenu();
+            });
+        });
+
+        /* Close on Escape key */
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('is-active')) {
+                closeMenu();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initMobile();
+        initMobileMenu();
+    });
 
 })();

@@ -26,7 +26,105 @@
             <a href="https://github.com/samarthsugandhi" class="nav__link" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href="https://www.linkedin.com/in/samarth-sugandhi-0082a32bb/" class="nav__link" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile">LinkedIn</a>
         </nav>
+        <!-- Mobile controls: Resume button + animated Menu toggle -->
+        <div class="header__mobile-actions" aria-label="Mobile Navigation Controls">
+            <a href="Samarth_Sugandhi_Resume.pdf" class="nav__link nav__link--accent nav__link--mobile-resume" download="Samarth_Sugandhi_Resume.pdf" aria-label="Download Samarth Sugandhi's resume as PDF">Resume</a>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-menu">
+                <span class="menu-toggle__box" aria-hidden="true">
+                    <span class="menu-toggle__line menu-toggle__line--1"></span>
+                    <span class="menu-toggle__line menu-toggle__line--2"></span>
+                </span>
+                <span class="menu-toggle__text">MENU</span>
+            </button>
+        </div>
     </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobile-menu" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Mobile Navigation Menu">
+        <div class="mobile-menu__backdrop" id="menu-backdrop"></div>
+        <div class="mobile-menu__panel">
+            <div class="mobile-menu__top">
+                <div class="mobile-menu__brand">
+                    <span class="mobile-menu__name">Samarth Sugandhi</span>
+                    <span class="mobile-menu__role">Software Engineer</span>
+                </div>
+                <button class="mobile-menu__close" id="menu-close" aria-label="Close navigation menu">
+                    <span class="mobile-menu__close-text">CLOSE</span>
+                    <span class="mobile-menu__close-icon" aria-hidden="true">✕</span>
+                </button>
+            </div>
+
+            <nav class="mobile-menu__nav" aria-label="Mobile Navigation Links">
+                <p class="mobile-menu__eyebrow">Sections</p>
+                <ul class="mobile-menu__list">
+                    <li class="mobile-menu__item" style="--item-index: 1;">
+                        <a href="projects.html" class="mobile-menu__link">
+                            <span class="mobile-menu__num">01</span>
+                            <span class="mobile-menu__title">Projects</span>
+                            <span class="mobile-menu__arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item" style="--item-index: 2;">
+                        <a href="hackathons.html" class="mobile-menu__link">
+                            <span class="mobile-menu__num">02</span>
+                            <span class="mobile-menu__title">Hackathons</span>
+                            <span class="mobile-menu__badge">4 WINS</span>
+                            <span class="mobile-menu__arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item" style="--item-index: 3;">
+                        <a href="journey.html" class="mobile-menu__link">
+                            <span class="mobile-menu__num">03</span>
+                            <span class="mobile-menu__title">Journey</span>
+                            <span class="mobile-menu__arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                    <li class="mobile-menu__item" style="--item-index: 4;">
+                        <a href="engineering.html" class="mobile-menu__link">
+                            <span class="mobile-menu__num">04</span>
+                            <span class="mobile-menu__title">Engineering</span>
+                            <span class="mobile-menu__arrow" aria-hidden="true">→</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <p class="mobile-menu__eyebrow">Connect &amp; Profile</p>
+                <div class="mobile-menu__quick-grid" style="--item-index: 5;">
+                    <a href="#about-modal" class="mobile-menu__card" id="mobile-link-about">
+                        <span class="mobile-menu__card-label">Profile</span>
+                        <span class="mobile-menu__card-title">About Samarth</span>
+                        <span class="mobile-menu__card-sub">Background &amp; Skills ↗</span>
+                    </a>
+                    <a href="#contact-modal" class="mobile-menu__card" id="mobile-link-contact">
+                        <span class="mobile-menu__card-label">Direct</span>
+                        <span class="mobile-menu__card-title">Get In Touch</span>
+                        <span class="mobile-menu__card-sub">Message &amp; Email ↗</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="mobile-menu__footer" style="--item-index: 6;">
+                <div class="mobile-menu__socials">
+                    <a href="https://github.com/samarthsugandhi" target="_blank" rel="noopener noreferrer" class="mobile-menu__social-link">
+                        <span>GitHub</span>
+                        <svg viewBox="0 0 12 12" fill="none" width="10" height="10" aria-hidden="true"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.4"/></svg>
+                    </a>
+                    <a href="https://www.linkedin.com/in/samarth-sugandhi-0082a32bb/" target="_blank" rel="noopener noreferrer" class="mobile-menu__social-link">
+                        <span>LinkedIn</span>
+                        <svg viewBox="0 0 12 12" fill="none" width="10" height="10" aria-hidden="true"><path d="M1 11L11 1M11 1H4M11 1V8" stroke="currentColor" stroke-width="1.4"/></svg>
+                    </a>
+                    <a href="Samarth_Sugandhi_Resume.pdf" download="Samarth_Sugandhi_Resume.pdf" class="mobile-menu__social-link mobile-menu__social-link--accent" aria-label="Download Samarth Sugandhi's Resume as PDF">
+                        <span>Resume</span>
+                        <svg viewBox="0 0 12 12" fill="none" width="10" height="10" aria-hidden="true"><path d="M6 1v7M3 5l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.4"/></svg>
+                    </a>
+                </div>
+                <div class="mobile-menu__status">
+                    <span class="footer__dot" aria-hidden="true"></span>
+                    <span>System / Online</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Five-Panel Compression Engine -->
     <main class="track" role="main" aria-label="Portfolio sections">
