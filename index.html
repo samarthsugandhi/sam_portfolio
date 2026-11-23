@@ -14,43 +14,81 @@
 <body>
 
     <!-- ============================================================
-         PRELOADER — Neural Compile
+         PRELOADER — Neural Compile v2
          ============================================================ -->
     <div id="preloader" class="preloader" aria-hidden="true" role="status" aria-label="Loading portfolio">
+        <!-- Film grain noise canvas -->
+        <canvas id="noise-canvas" class="preloader__noise" aria-hidden="true"></canvas>
         <!-- Matrix rain canvas -->
         <canvas id="matrix-canvas" class="preloader__matrix" aria-hidden="true"></canvas>
-
+        <!-- Scanline sweep -->
+        <div class="preloader__sweep" aria-hidden="true"></div>
         <!-- Horizontal glitch slices (populated by JS) -->
         <div class="preloader__slices" id="preloader-slices" aria-hidden="true"></div>
+        <!-- Boot timer (top-right corner) -->
+        <div class="preloader__timer" id="boot-timer" aria-hidden="true">BOOT_T: <span id="timer-ms">0000</span>ms</div>
+        <!-- Corner HUD brackets -->
+        <div class="preloader__hud-tl" aria-hidden="true"><span></span><span></span></div>
+        <div class="preloader__hud-br" aria-hidden="true"><span></span><span></span></div>
 
         <!-- Center stage -->
-        <div class="preloader__stage">
+        <div class="preloader__stage" id="preloader-stage">
 
             <!-- Glitching name -->
             <div class="preloader__name-wrap">
+                <div class="preloader__label-row" aria-hidden="true">
+                    <span class="preloader__led" id="preloader-led"></span>
+                    <span class="preloader__label-tag">SOFTWARE ENGINEER</span>
+                </div>
                 <div class="preloader__name" id="preloader-name" data-text="SAMARTH SUGANDHI" aria-label="Samarth Sugandhi">SAMARTH SUGANDHI</div>
                 <div class="preloader__subtitle" id="preloader-subtitle" aria-live="polite">INITIALIZING...</div>
             </div>
 
-            <!-- Circular compile ring -->
-            <div class="preloader__ring-wrap" aria-hidden="true">
-                <svg class="preloader__ring-svg" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Dashed orbit -->
-                    <circle class="preloader__orbit" cx="70" cy="70" r="62"/>
-                    <!-- Progress arc -->
-                    <circle class="preloader__arc" id="preloader-arc" cx="70" cy="70" r="62"/>
-                    <!-- Rotating spark dot -->
-                    <circle class="preloader__spark" id="preloader-spark" cx="132" cy="70" r="4"/>
-                </svg>
-                <div class="preloader__pct-wrap">
-                    <span class="preloader__pct" id="preloader-pct">0</span>
-                    <span class="preloader__pct-sign">%</span>
+            <!-- Visualizer + Ring row -->
+            <div class="preloader__mid-row">
+                <!-- Left EQ bars -->
+                <div class="preloader__viz" id="viz-left" aria-hidden="true"></div>
+
+                <!-- Circular compile ring -->
+                <div class="preloader__ring-wrap" id="preloader-ring-wrap" aria-hidden="true">
+                    <!-- Outer glow ring (pure CSS pulse) -->
+                    <div class="preloader__ring-glow"></div>
+                    <svg class="preloader__ring-svg" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Dashed orbit -->
+                        <circle class="preloader__orbit" cx="70" cy="70" r="62"/>
+                        <!-- Secondary inner orbit -->
+                        <circle class="preloader__orbit preloader__orbit--inner" cx="70" cy="70" r="52"/>
+                        <!-- Progress arc -->
+                        <circle class="preloader__arc" id="preloader-arc" cx="70" cy="70" r="62"/>
+                        <!-- Rotating spark dot -->
+                        <circle class="preloader__spark" id="preloader-spark" cx="132" cy="70" r="4"/>
+                        <!-- Trailing spark dot (smaller, delayed) -->
+                        <circle class="preloader__spark preloader__spark--trail" id="preloader-spark-trail" cx="132" cy="70" r="2.5"/>
+                    </svg>
+                    <div class="preloader__pct-wrap">
+                        <span class="preloader__pct" id="preloader-pct">0</span>
+                        <span class="preloader__pct-sign">%</span>
+                    </div>
                 </div>
+
+                <!-- Right EQ bars -->
+                <div class="preloader__viz" id="viz-right" aria-hidden="true"></div>
             </div>
 
             <!-- Scramble status line -->
-            <div class="preloader__status" id="preloader-status" aria-live="polite">SYS_BOOT</div>
+            <div class="preloader__status-row" aria-hidden="true">
+                <span class="preloader__status-icon">▶</span>
+                <span class="preloader__status" id="preloader-status" aria-live="polite">SYS_BOOT</span>
+            </div>
 
+        </div>
+
+        <!-- Tech stack ticker (bottom) -->
+        <div class="preloader__ticker" aria-hidden="true">
+            <div class="preloader__ticker-track">
+                <span>NEXT.JS</span> <em>◆</em> <span>REACT</span> <em>◆</em> <span>NODE.JS</span> <em>◆</em> <span>MONGODB</span> <em>◆</em> <span>TYPESCRIPT</span> <em>◆</em> <span>TAILWIND CSS</span> <em>◆</em> <span>SOCKET.IO</span> <em>◆</em> <span>PYTHON</span> <em>◆</em> <span>AI / ML</span> <em>◆</em> <span>BLOCKCHAIN</span> <em>◆</em> <span>SHA-256</span> <em>◆</em> <span>REST APIs</span> <em>◆</em>
+                <span>NEXT.JS</span> <em>◆</em> <span>REACT</span> <em>◆</em> <span>NODE.JS</span> <em>◆</em> <span>MONGODB</span> <em>◆</em> <span>TYPESCRIPT</span> <em>◆</em> <span>TAILWIND CSS</span> <em>◆</em> <span>SOCKET.IO</span> <em>◆</em> <span>PYTHON</span> <em>◆</em> <span>AI / ML</span> <em>◆</em> <span>BLOCKCHAIN</span> <em>◆</em> <span>SHA-256</span> <em>◆</em> <span>REST APIs</span> <em>◆</em>
+            </div>
         </div>
 
         <!-- Full-screen glitch flash layer -->

@@ -12,236 +12,362 @@
     'use strict';
 
     /* ================================================================
-       PRELOADER — Neural Compile
-       Sections:
-         1. Matrix rain (Canvas)
-         2. Compile ring (SVG arc + rotating spark)
-         3. Text scramble (name subtitle + status line)
-         4. Glitch burst (random flashes + name shake)
-         5. Dismiss with horizontal slice shatter
+       PRELOADER — Neural Compile v2
+       1. Film grain noise (canvas, quarter-res)
+       2. Matrix rain (canvas, custom charset)
+       3. Compile ring (SVG arc + dual spark + supernova at 100%)
+       4. EQ Audio visualizer (8 bars × 2, rAF sine waves)
+       5. Mouse parallax 3D tilt on stage
+       6. Boot millisecond timer (top-right)
+       7. Text scramble (subtitle + status cycling)
+       8. Glitch burst (5 × flash + name shake)
+       9. Dismiss: stage zoom + horizontal slice shatter
        ================================================================ */
     function initPreloader() {
         var preloader  = document.getElementById('preloader');
         if (!preloader) return;
 
-        /* Skip on revisit within same session */
         if (sessionStorage.getItem('ss_loaded')) {
             preloader.style.display = 'none';
             return;
         }
 
         /* ── DOM refs ── */
-        var canvas    = document.getElementById('matrix-canvas');
-        var arcEl     = document.getElementById('preloader-arc');
-        var sparkEl   = document.getElementById('preloader-spark');
-        var pctEl     = document.getElementById('preloader-pct');
-        var subtitleEl= document.getElementById('preloader-subtitle');
-        var statusEl  = document.getElementById('preloader-status');
-        var nameEl    = document.getElementById('preloader-name');
-        var flashEl   = document.getElementById('preloader-flash');
-        var slicesEl  = document.getElementById('preloader-slices');
+        var matrixCanvas  = document.getElementById('matrix-canvas');
+        var noiseCanvas   = document.getElementById('noise-canvas');
+        var arcEl         = document.getElementById('preloader-arc');
+        var sparkEl       = document.getElementById('preloader-spark');
+        var sparkTrailEl  = document.getElementById('preloader-spark-trail');
+        var pctEl         = document.getElementById('preloader-pct');
+        var subtitleEl    = document.getElementById('preloader-subtitle');
+        var statusEl      = document.getElementById('preloader-status');
+        var nameEl        = document.getElementById('preloader-name');
+        var flashEl       = document.getElementById('preloader-flash');
+        var slicesEl      = document.getElementById('preloader-slices');
+        var stageEl       = document.getElementById('preloader-stage');
+        var ringWrapEl    = document.getElementById('preloader-ring-wrap');
+        var vizLeftEl     = document.getElementById('viz-left');
+        var vizRightEl    = document.getElementById('viz-right');
+        var timerSpan     = document.getElementById('timer-ms');
 
-        /* ── 1. MATRIX RAIN ── */
-        var ctx   = canvas.getContext('2d');
-        var CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ{}[]()<>/*+-=#!?REACT NODE NEXT.JS MONGO TYPESCRIPT'.split('');
-        var cols, drops, matrixRaf;
+        var rafHandles = [];
+        var startTime  = Date.now();
 
-        function resizeMatrix() {
-            canvas.width  = window.innerWidth;
-            canvas.height = window.innerHeight;
-            cols  = Math.floor(canvas.width / 16);
-            drops = Array(cols).fill(1);
-        }
-
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(14,14,14,0.08)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.font = '14px "Space Mono", monospace';
-            for (var i = 0; i < drops.length; i++) {
-                var bright = Math.random() > 0.95;
-                ctx.fillStyle = bright ? '#FFFFFF' : (Math.random() > 0.6 ? '#DFFF00' : 'rgba(223,255,0,0.3)');
-                ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], i * 16, drops[i] * 16);
-                if (drops[i] * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
+        /* ───────────────────────────────
+           1. FILM GRAIN (noise canvas)
+        ─────────────────────────────── */
+        (function initNoise() {
+            if (!noiseCanvas) return;
+            var nCtx = noiseCanvas.getContext('2d');
+            var W, H;
+            function resizeNoise() {
+                /* Quarter resolution — scaled up via CSS for perf */
+                W = noiseCanvas.width  = Math.ceil(window.innerWidth  / 4);
+                H = noiseCanvas.height = Math.ceil(window.innerHeight / 4);
+                noiseCanvas.style.width  = window.innerWidth  + 'px';
+                noiseCanvas.style.height = window.innerHeight + 'px';
             }
-            matrixRaf = requestAnimationFrame(drawMatrix);
+            resizeNoise();
+            window.addEventListener('resize', resizeNoise);
+            function drawNoise() {
+                var img  = nCtx.createImageData(W, H);
+                var data = img.data;
+                for (var i = 0; i < data.length; i += 4) {
+                    var v = (Math.random() * 255) | 0;
+                    data[i] = data[i+1] = data[i+2] = v;
+                    data[i+3] = (Math.random() * 22) | 0;
+                }
+                nCtx.putImageData(img, 0, 0);
+                rafHandles.push(requestAnimationFrame(drawNoise));
+            }
+            drawNoise();
+        })();
+
+        /* ───────────────────────────────
+           2. MATRIX RAIN
+        ─────────────────────────────── */
+        (function initMatrix() {
+            if (!matrixCanvas) return;
+            var mCtx  = matrixCanvas.getContext('2d');
+            var CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ{}[]()<>/*+-=#!?REACT NODE NEXT.JS MONGO TYPESCRIPT'.split('');
+            var cols, drops;
+            function resizeMatrix() {
+                matrixCanvas.width  = window.innerWidth;
+                matrixCanvas.height = window.innerHeight;
+                cols  = Math.floor(matrixCanvas.width / 15);
+                drops = Array(cols).fill(1);
+            }
+            resizeMatrix();
+            window.addEventListener('resize', resizeMatrix);
+            function drawMatrix() {
+                mCtx.fillStyle = 'rgba(14,14,14,0.09)';
+                mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+                mCtx.font = '13px "Space Mono", monospace';
+                for (var i = 0; i < drops.length; i++) {
+                    var bright = Math.random() > 0.94;
+                    mCtx.fillStyle = bright ? '#FFFFFF' : (Math.random() > 0.55 ? '#DFFF00' : 'rgba(223,255,0,0.28)');
+                    mCtx.fillText(CHARS[(Math.random() * CHARS.length) | 0], i * 15, drops[i] * 15);
+                    if (drops[i] * 15 > matrixCanvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+                rafHandles.push(requestAnimationFrame(drawMatrix));
+            }
+            drawMatrix();
+        })();
+
+        /* ───────────────────────────────
+           3. COMPILE RING + DUAL SPARK
+        ─────────────────────────────── */
+        var CIRC      = 2 * Math.PI * 62;  /* r=62 → 389.56 */
+        var currentPct = 0;
+        var targetPct  = 0;
+        var TRAIL_LAG  = 0.08;             /* radians behind main spark */
+        var novaFired  = false;
+
+        function setProgress(pct) { targetPct = pct; }
+
+        function positionSpark(el, angle, r) {
+            el.setAttribute('cx', 70 + r * Math.cos(angle));
+            el.setAttribute('cy', 70 + r * Math.sin(angle));
         }
 
-        resizeMatrix();
-        window.addEventListener('resize', resizeMatrix);
-        drawMatrix();
-
-        /* ── 2. COMPILE RING ── */
-        var CIRCUMFERENCE = 2 * Math.PI * 62; /* r=62 → ≈389.56 */
-        var currentPct    = 0;
-        var targetPct     = 0;
-        var sparkAngle    = -Math.PI / 2; /* start at top (arc starts at -90°) */
-        var sparkRaf;
-
-        function setProgress(pct) {
-            targetPct = pct;
-        }
-
-        function animRing() {
-            /* Smooth number chase */
+        (function animRing() {
             if (currentPct < targetPct) {
-                currentPct = Math.min(currentPct + 0.6, targetPct);
-                var offset = CIRCUMFERENCE * (1 - currentPct / 100);
-                arcEl.style.strokeDashoffset = offset;
+                currentPct = Math.min(currentPct + 0.65, targetPct);
+                arcEl.style.strokeDashoffset = CIRC * (1 - currentPct / 100);
                 pctEl.textContent = Math.floor(currentPct);
-                /* Rotate spark to match arc progress */
                 var angle = -Math.PI / 2 + (2 * Math.PI * currentPct / 100);
-                var cx = 70 + 62 * Math.cos(angle);
-                var cy = 70 + 62 * Math.sin(angle);
-                sparkEl.setAttribute('cx', cx);
-                sparkEl.setAttribute('cy', cy);
-            }
-            sparkRaf = requestAnimationFrame(animRing);
-        }
-        animRing();
+                positionSpark(sparkEl, angle, 62);
+                positionSpark(sparkTrailEl, angle - TRAIL_LAG, 62);
 
-        /* ── 3. TEXT SCRAMBLE ── */
-        var SCRAMBLE_CHARS = '!<>-_\\/[]{}—=+*^?#@$%&';
-        function scramble(el, finalText, duration, cb) {
-            var frame = 0;
-            var totalFrames = Math.round(duration / 1000 * 60);
-            var interval = setInterval(function () {
+                /* Supernova at 100% */
+                if (currentPct >= 100 && !novaFired) {
+                    novaFired = true;
+                    arcEl.classList.add('preloader__arc--nova');
+                    ringWrapEl.classList.add('preloader__ring-wrap--nova');
+                    flashEl.classList.remove('preloader__flash--on');
+                    void flashEl.offsetWidth;
+                    flashEl.classList.add('preloader__flash--on');
+                }
+            }
+            rafHandles.push(requestAnimationFrame(animRing));
+        })();
+
+        /* ───────────────────────────────
+           4. EQ AUDIO VISUALIZER
+        ─────────────────────────────── */
+        var BAR_COUNT  = 8;
+        var vizBarsL   = [];
+        var vizBarsR   = [];
+        var vizPhases  = [];
+
+        (function initViz() {
+            if (!vizLeftEl || !vizRightEl) return;
+            for (var i = 0; i < BAR_COUNT; i++) {
+                vizPhases.push(Math.random() * Math.PI * 2);
+                var bL = document.createElement('div');
+                bL.className = 'preloader__viz-bar';
+                vizLeftEl.appendChild(bL);
+                vizBarsL.push(bL);
+
+                var bR = document.createElement('div');
+                bR.className = 'preloader__viz-bar';
+                vizRightEl.appendChild(bR);
+                vizBarsR.push(bR);
+            }
+
+            var t = 0;
+            (function animViz() {
+                t += 0.055;
+                for (var j = 0; j < BAR_COUNT; j++) {
+                    /* Each bar = multi-sine combo for organic randomness */
+                    var h = 12 + 32 * (
+                        0.5 * Math.abs(Math.sin(t * 1.3 + vizPhases[j])) +
+                        0.3 * Math.abs(Math.sin(t * 2.1 + vizPhases[j] * 1.4)) +
+                        0.2 * Math.abs(Math.sin(t * 0.7 + vizPhases[j] * 0.6))
+                    );
+                    /* Scale with progress so bars grow as compile advances */
+                    var scale = 0.4 + 0.6 * (currentPct / 100);
+                    h *= scale;
+                    vizBarsL[j].style.height = h + 'px';
+                    vizBarsR[BAR_COUNT - 1 - j].style.height = h + 'px';
+                    /* Opacity fade out bars toward edges */
+                    var alpha = 0.4 + 0.6 * (j / (BAR_COUNT - 1));
+                    vizBarsL[j].style.opacity = alpha;
+                    vizBarsR[BAR_COUNT - 1 - j].style.opacity = alpha;
+                }
+                rafHandles.push(requestAnimationFrame(animViz));
+            })();
+        })();
+
+        /* ───────────────────────────────
+           5. MOUSE PARALLAX 3D TILT
+        ─────────────────────────────── */
+        (function initParallax() {
+            if (!stageEl) return;
+            var mx = 0, my = 0, tx = 0, ty = 0;
+            document.addEventListener('mousemove', function (e) {
+                mx = (e.clientX / window.innerWidth  - 0.5) * 2;
+                my = (e.clientY / window.innerHeight - 0.5) * 2;
+            });
+            (function parallaxLoop() {
+                /* Smooth lerp toward mouse position */
+                tx += (mx - tx) * 0.08;
+                ty += (my - ty) * 0.08;
+                stageEl.style.transform =
+                    'perspective(900px) rotateY(' + (tx * 5) + 'deg) rotateX(' + (-ty * 3.5) + 'deg)';
+                rafHandles.push(requestAnimationFrame(parallaxLoop));
+            })();
+        })();
+
+        /* ───────────────────────────────
+           6. BOOT MILLISECOND TIMER
+        ─────────────────────────────── */
+        (function initTimer() {
+            if (!timerSpan) return;
+            var iv = setInterval(function () {
+                var ms = Date.now() - startTime;
+                timerSpan.textContent = String(ms).padStart(4, '0');
+            }, 50);
+            /* Stop after dismiss */
+            setTimeout(function () { clearInterval(iv); }, 3200);
+        })();
+
+        /* ───────────────────────────────
+           7. TEXT SCRAMBLE ENGINE
+        ─────────────────────────────── */
+        var SC_CHARS = '!<>-_\\/[]{}—=+*^?#@$%&';
+        function scramble(el, final_, ms, cb) {
+            var frames = Math.round(ms / 1000 * 60);
+            var f = 0;
+            var iv = setInterval(function () {
                 var out = '';
-                for (var i = 0; i < finalText.length; i++) {
-                    if (finalText[i] === ' ') { out += ' '; continue; }
-                    if (frame / totalFrames > i / finalText.length) {
-                        out += finalText[i];
-                    } else {
-                        out += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-                    }
+                for (var i = 0; i < final_.length; i++) {
+                    if (final_[i] === ' ') { out += ' '; continue; }
+                    out += (f / frames > i / final_.length)
+                        ? final_[i]
+                        : SC_CHARS[(Math.random() * SC_CHARS.length) | 0];
                 }
                 el.textContent = out;
-                frame++;
-                if (frame >= totalFrames) {
-                    clearInterval(interval);
-                    el.textContent = finalText;
+                if (++f >= frames) {
+                    clearInterval(iv);
+                    el.textContent = final_;
                     if (cb) cb();
                 }
             }, 1000 / 60);
         }
 
-        /* Status messages that cycle */
-        var statusMsgs = [
-            'SYS_BOOT', 'LOADING_MODULES', 'COMPILING_REACT', 'INIT_MONGODB',
-            'SYNC_GITHUB_API', 'BUILD_COMPLETE', 'DEPLOYING...', 'SYSTEM_READY'
-        ];
-        var statusIdx = 0;
-        var statusInterval = setInterval(function () {
-            statusIdx = Math.min(statusIdx + 1, statusMsgs.length - 1);
-            scramble(statusEl, statusMsgs[statusIdx], 400);
-            if (statusIdx === statusMsgs.length - 1) clearInterval(statusInterval);
-        }, 350);
-
-        /* Subtitle scramble sequence */
-        var subtitles = [
-            { text: 'INITIALIZING...',  delay: 0    },
-            { text: 'LOADING STACK...',  delay: 500  },
-            { text: 'COMPILING...',      delay: 1100 },
-            { text: 'DEPLOYING...',      delay: 1750 },
-            { text: 'ONLINE',            delay: 2300 },
-        ];
-        subtitles.forEach(function (s) {
-            setTimeout(function () { scramble(subtitleEl, s.text, 350); }, s.delay);
+        /* Subtitle sequence */
+        [
+            { t: 'INITIALIZING...',  d: 0    },
+            { t: 'LOADING STACK...', d: 500  },
+            { t: 'COMPILING...',     d: 1100 },
+            { t: 'DEPLOYING...',     d: 1750 },
+            { t: 'ONLINE  ✓',        d: 2350 },
+        ].forEach(function (s) {
+            setTimeout(function () { scramble(subtitleEl, s.t, 350); }, s.d);
         });
 
-        /* ── 4. GLITCH BURSTS ── */
-        var glitchTimes = [600, 1050, 1400, 1900, 2250];
-        glitchTimes.forEach(function (t) {
+        /* Status cycle */
+        var statusMsgs = [
+            'SYS_BOOT', 'LOADING_MODULES', 'COMPILING_REACT',
+            'INIT_MONGODB', 'SYNC_GITHUB_API', 'BUILD_COMPLETE',
+            'DEPLOYING...', 'SYSTEM_READY'
+        ];
+        var sIdx = 0;
+        var statusIv = setInterval(function () {
+            sIdx = Math.min(sIdx + 1, statusMsgs.length - 1);
+            scramble(statusEl, statusMsgs[sIdx], 380);
+            if (sIdx === statusMsgs.length - 1) clearInterval(statusIv);
+        }, 340);
+
+        /* ───────────────────────────────
+           8. GLITCH BURSTS
+        ─────────────────────────────── */
+        [550, 980, 1380, 1820, 2280].forEach(function (delay, idx) {
             setTimeout(function () {
                 /* Flash */
                 flashEl.classList.remove('preloader__flash--on');
-                void flashEl.offsetWidth; /* force reflow */
+                void flashEl.offsetWidth;
                 flashEl.classList.add('preloader__flash--on');
                 /* Name shake */
                 nameEl.classList.remove('preloader__name--glitch');
                 void nameEl.offsetWidth;
                 nameEl.classList.add('preloader__name--glitch');
-                setTimeout(function () { nameEl.classList.remove('preloader__name--glitch'); }, 200);
-            }, t);
+                setTimeout(function () {
+                    nameEl.classList.remove('preloader__name--glitch');
+                }, 180);
+            }, delay);
         });
 
-        /* ── Progress milestones ── */
-        var milestones = [
-            [300,  18], [600,  32], [900,  47],
-            [1200, 61], [1550, 75], [1850, 88], [2200, 100]
-        ];
-        milestones.forEach(function (m) {
+        /* Progress milestones */
+        [[250,15],[550,30],[900,45],[1200,58],[1550,72],[1860,86],[2300,100]].forEach(function (m) {
             setTimeout(function () { setProgress(m[1]); }, m[0]);
         });
 
-        /* ── 5. DISMISS — Slice shatter ── */
+        /* ───────────────────────────────
+           9. DISMISS — Slice shatter
+        ─────────────────────────────── */
         function sliceShatter() {
-            cancelAnimationFrame(matrixRaf);
-            cancelAnimationFrame(sparkRaf);
+            /* Cancel all rAF loops */
+            rafHandles.forEach(function (h) { cancelAnimationFrame(h); });
 
-            var NUM_SLICES = 12;
-            var H          = window.innerHeight;
-            var sliceH     = Math.ceil(H / NUM_SLICES);
+            var NUM    = 14;
+            var H      = window.innerHeight;
+            var sliceH = Math.ceil(H / NUM);
 
-            /* Snapshot the whole preloader into an offscreen canvas */
-            var snap = document.createElement('canvas');
-            snap.width  = window.innerWidth;
+            /* Snapshot matrix canvas */
+            var snap  = document.createElement('canvas');
+            snap.width = window.innerWidth;
             snap.height = H;
             var sCtx = snap.getContext('2d');
-            /* Fill with solid bg — we can't html2canvas so we simulate with the matrix canvas */
             sCtx.fillStyle = '#0E0E0E';
-            sCtx.fillRect(0, 0, snap.width, snap.height);
-            sCtx.drawImage(canvas, 0, 0);
+            sCtx.fillRect(0, 0, snap.width, H);
+            if (matrixCanvas) sCtx.drawImage(matrixCanvas, 0, 0);
 
-            /* Build slice divs */
-            for (var i = 0; i < NUM_SLICES; i++) {
+            for (var i = 0; i < NUM; i++) {
                 var slice = document.createElement('div');
                 slice.className = 'preloader__slice';
                 slice.style.top    = (i * sliceH) + 'px';
                 slice.style.height = sliceH + 'px';
-                /* Mini canvas showing that row of the snapshot */
-                var sc = document.createElement('canvas');
+                slice.style.transition = 'transform 0.5s cubic-bezier(0.76,0,0.24,1) ' + (i * 15) + 'ms, opacity 0.5s ease ' + (i * 15) + 'ms';
+
+                var sc  = document.createElement('canvas');
                 sc.width  = snap.width;
                 sc.height = sliceH;
-                sc.style.position = 'absolute';
-                sc.style.top  = '0';
-                sc.style.left = '0';
-                sc.style.width  = '100%';
-                sc.style.height = sliceH + 'px';
-                var scCtx = sc.getContext('2d');
-                scCtx.drawImage(snap, 0, i * sliceH, snap.width, sliceH, 0, 0, snap.width, sliceH);
+                sc.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:' + sliceH + 'px';
+                sc.getContext('2d').drawImage(snap, 0, i * sliceH, snap.width, sliceH, 0, 0, snap.width, sliceH);
                 slice.appendChild(sc);
                 slicesEl.appendChild(slice);
             }
 
-            /* Stage zoom + fade */
+            /* Stage fades + zooms */
             preloader.classList.add('preloader--exit');
 
-            /* Stagger slices left/right alternately */
+            /* Trigger slice animations */
             var sliceDivs = slicesEl.querySelectorAll('.preloader__slice');
             sliceDivs.forEach(function (sl, idx) {
+                /* Alternating + accelerating scatter */
                 var dir  = idx % 2 === 0 ? 1 : -1;
-                var dist = 60 + Math.random() * 160;
-                var delay = 20 + idx * 18;
+                var dist = 80 + idx * 14 + Math.random() * 60;
+                /* Small jitter in Y too */
+                var dy = (Math.random() - 0.5) * 20;
                 setTimeout(function () {
-                    sl.style.transform = 'translateX(' + (dir * dist) + 'px)';
+                    sl.style.transform = 'translateX(' + (dir * dist) + 'px) translateY(' + dy + 'px)';
                     sl.style.opacity   = '0';
-                }, delay);
+                }, 10);
             });
 
-            /* Final: hide & mark session */
+            /* Final: remove preloader */
             setTimeout(function () {
                 preloader.style.display = 'none';
                 sessionStorage.setItem('ss_loaded', '1');
-                window.removeEventListener('resize', resizeMatrix);
-            }, 700);
+            }, 750);
         }
 
-        /* Trigger dismiss at 2.9s */
-        setTimeout(sliceShatter, 2900);
+        setTimeout(sliceShatter, 3000);
     }
 
-    /* Run immediately — preloader is first element in <body> */
     initPreloader();
 
     /* ── GitHub API ── */
