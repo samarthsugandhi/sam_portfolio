@@ -14,44 +14,47 @@
 <body>
 
     <!-- ============================================================
-         PRELOADER — Terminal Boot Screen
+         PRELOADER — Neural Compile
          ============================================================ -->
     <div id="preloader" class="preloader" aria-hidden="true" role="status" aria-label="Loading portfolio">
-        <!-- Scan-line overlay -->
-        <div class="preloader__scanlines" aria-hidden="true"></div>
-        <!-- Corner brackets -->
-        <div class="preloader__corner preloader__corner--tl" aria-hidden="true"></div>
-        <div class="preloader__corner preloader__corner--tr" aria-hidden="true"></div>
-        <div class="preloader__corner preloader__corner--bl" aria-hidden="true"></div>
-        <div class="preloader__corner preloader__corner--br" aria-hidden="true"></div>
+        <!-- Matrix rain canvas -->
+        <canvas id="matrix-canvas" class="preloader__matrix" aria-hidden="true"></canvas>
 
-        <div class="preloader__inner">
-            <!-- Monogram -->
-            <div class="preloader__monogram" aria-hidden="true">SS</div>
+        <!-- Horizontal glitch slices (populated by JS) -->
+        <div class="preloader__slices" id="preloader-slices" aria-hidden="true"></div>
 
-            <!-- Terminal window -->
-            <div class="preloader__terminal" aria-label="Terminal boot sequence">
-                <div class="preloader__terminal-bar" aria-hidden="true">
-                    <span class="preloader__dot preloader__dot--red"></span>
-                    <span class="preloader__dot preloader__dot--yellow"></span>
-                    <span class="preloader__dot preloader__dot--green"></span>
-                    <span class="preloader__terminal-title">boot.sh — samarth@portfolio</span>
-                </div>
-                <div class="preloader__lines" id="preloader-lines" aria-live="polite"></div>
-                <span class="preloader__cursor" aria-hidden="true"></span>
+        <!-- Center stage -->
+        <div class="preloader__stage">
+
+            <!-- Glitching name -->
+            <div class="preloader__name-wrap">
+                <div class="preloader__name" id="preloader-name" data-text="SAMARTH SUGANDHI" aria-label="Samarth Sugandhi">SAMARTH SUGANDHI</div>
+                <div class="preloader__subtitle" id="preloader-subtitle" aria-live="polite">INITIALIZING...</div>
             </div>
 
-            <!-- Progress bar -->
-            <div class="preloader__bar-wrap" aria-hidden="true">
-                <div class="preloader__bar-track">
-                    <div class="preloader__bar" id="preloader-bar"></div>
+            <!-- Circular compile ring -->
+            <div class="preloader__ring-wrap" aria-hidden="true">
+                <svg class="preloader__ring-svg" viewBox="0 0 140 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Dashed orbit -->
+                    <circle class="preloader__orbit" cx="70" cy="70" r="62"/>
+                    <!-- Progress arc -->
+                    <circle class="preloader__arc" id="preloader-arc" cx="70" cy="70" r="62"/>
+                    <!-- Rotating spark dot -->
+                    <circle class="preloader__spark" id="preloader-spark" cx="132" cy="70" r="4"/>
+                </svg>
+                <div class="preloader__pct-wrap">
+                    <span class="preloader__pct" id="preloader-pct">0</span>
+                    <span class="preloader__pct-sign">%</span>
                 </div>
-                <span class="preloader__bar-pct" id="preloader-pct">0%</span>
             </div>
 
-            <!-- Ready label (shown at end) -->
-            <div class="preloader__ready" id="preloader-ready" aria-hidden="true">SYSTEM READY</div>
+            <!-- Scramble status line -->
+            <div class="preloader__status" id="preloader-status" aria-live="polite">SYS_BOOT</div>
+
         </div>
+
+        <!-- Full-screen glitch flash layer -->
+        <div class="preloader__flash" id="preloader-flash" aria-hidden="true"></div>
     </div>
 
     <!-- Global Header -->

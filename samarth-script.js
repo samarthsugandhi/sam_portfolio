@@ -12,10 +12,16 @@
     'use strict';
 
     /* ================================================================
-       PRELOADER — Terminal Boot Screen
+       PRELOADER — Neural Compile
+       Sections:
+         1. Matrix rain (Canvas)
+         2. Compile ring (SVG arc + rotating spark)
+         3. Text scramble (name subtitle + status line)
+         4. Glitch burst (random flashes + name shake)
+         5. Dismiss with horizontal slice shatter
        ================================================================ */
     function initPreloader() {
-        var preloader = document.getElementById('preloader');
+        var preloader  = document.getElementById('preloader');
         if (!preloader) return;
 
         /* Skip on revisit within same session */
@@ -24,71 +30,218 @@
             return;
         }
 
-        var linesEl  = document.getElementById('preloader-lines');
-        var barEl    = document.getElementById('preloader-bar');
-        var pctEl    = document.getElementById('preloader-pct');
-        var readyEl  = document.getElementById('preloader-ready');
+        /* ── DOM refs ── */
+        var canvas    = document.getElementById('matrix-canvas');
+        var arcEl     = document.getElementById('preloader-arc');
+        var sparkEl   = document.getElementById('preloader-spark');
+        var pctEl     = document.getElementById('preloader-pct');
+        var subtitleEl= document.getElementById('preloader-subtitle');
+        var statusEl  = document.getElementById('preloader-status');
+        var nameEl    = document.getElementById('preloader-name');
+        var flashEl   = document.getElementById('preloader-flash');
+        var slicesEl  = document.getElementById('preloader-slices');
 
-        /* Boot sequence lines: [text, class-suffix, delay-ms, progress-%] */
-        var sequence = [
-            ['> Booting portfolio OS v2.0.26...',      'prompt', 0,    8 ],
-            ['> CPU: 12-core | RAM: 32 GB DDR5',       'dim',    260,  16],
-            ['> Mounting filesystem /dev/samarth...',  'prompt', 500,  25],
-            ['> Loading modules: projects ✓',          '',       780,  34],
-            ['> Loading modules: hackathons [4 wins]', '',       980,  43],
-            ['> Loading modules: journey ✓',           '',       1140, 52],
-            ['> Loading modules: engineering ✓',       '',       1290, 61],
-            ['> Loading modules: github-sync ✓',       '',       1430, 70],
-            ['> Running diagnostics... PASSED',        'ok',     1620, 82],
-            ['> Connecting to samarth.portfolio...',   'prompt', 1830, 92],
-            ['> Authentication: OK | ENV: PRODUCTION', 'ok',    2040, 100],
-        ];
+        /* ── 1. MATRIX RAIN ── */
+        var ctx   = canvas.getContext('2d');
+        var CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノ{}[]()<>/*+-=#!?REACT NODE NEXT.JS MONGO TYPESCRIPT'.split('');
+        var cols, drops, matrixRaf;
 
-        /* Animate progress smoothly */
+        function resizeMatrix() {
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
+            cols  = Math.floor(canvas.width / 16);
+            drops = Array(cols).fill(1);
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(14,14,14,0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = '14px "Space Mono", monospace';
+            for (var i = 0; i < drops.length; i++) {
+                var bright = Math.random() > 0.95;
+                ctx.fillStyle = bright ? '#FFFFFF' : (Math.random() > 0.6 ? '#DFFF00' : 'rgba(223,255,0,0.3)');
+                ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], i * 16, drops[i] * 16);
+                if (drops[i] * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+            matrixRaf = requestAnimationFrame(drawMatrix);
+        }
+
+        resizeMatrix();
+        window.addEventListener('resize', resizeMatrix);
+        drawMatrix();
+
+        /* ── 2. COMPILE RING ── */
+        var CIRCUMFERENCE = 2 * Math.PI * 62; /* r=62 → ≈389.56 */
+        var currentPct    = 0;
+        var targetPct     = 0;
+        var sparkAngle    = -Math.PI / 2; /* start at top (arc starts at -90°) */
+        var sparkRaf;
+
         function setProgress(pct) {
-            barEl.style.width = pct + '%';
-            pctEl.textContent = pct + '%';
+            targetPct = pct;
         }
 
-        /* Append one line to the terminal */
-        function addLine(text, cls) {
-            var el = document.createElement('div');
-            el.className = 'preloader__line' + (cls ? ' preloader__line--' + cls : '');
-            el.textContent = text;
-            linesEl.appendChild(el);
-            /* Keep last lines visible — scroll terminal */
-            linesEl.scrollTop = linesEl.scrollHeight;
+        function animRing() {
+            /* Smooth number chase */
+            if (currentPct < targetPct) {
+                currentPct = Math.min(currentPct + 0.6, targetPct);
+                var offset = CIRCUMFERENCE * (1 - currentPct / 100);
+                arcEl.style.strokeDashoffset = offset;
+                pctEl.textContent = Math.floor(currentPct);
+                /* Rotate spark to match arc progress */
+                var angle = -Math.PI / 2 + (2 * Math.PI * currentPct / 100);
+                var cx = 70 + 62 * Math.cos(angle);
+                var cy = 70 + 62 * Math.sin(angle);
+                sparkEl.setAttribute('cx', cx);
+                sparkEl.setAttribute('cy', cy);
+            }
+            sparkRaf = requestAnimationFrame(animRing);
+        }
+        animRing();
+
+        /* ── 3. TEXT SCRAMBLE ── */
+        var SCRAMBLE_CHARS = '!<>-_\\/[]{}—=+*^?#@$%&';
+        function scramble(el, finalText, duration, cb) {
+            var frame = 0;
+            var totalFrames = Math.round(duration / 1000 * 60);
+            var interval = setInterval(function () {
+                var out = '';
+                for (var i = 0; i < finalText.length; i++) {
+                    if (finalText[i] === ' ') { out += ' '; continue; }
+                    if (frame / totalFrames > i / finalText.length) {
+                        out += finalText[i];
+                    } else {
+                        out += SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
+                    }
+                }
+                el.textContent = out;
+                frame++;
+                if (frame >= totalFrames) {
+                    clearInterval(interval);
+                    el.textContent = finalText;
+                    if (cb) cb();
+                }
+            }, 1000 / 60);
         }
 
-        /* Schedule each boot line */
-        sequence.forEach(function (item) {
-            var text = item[0], cls = item[1], delay = item[2], pct = item[3];
-            setTimeout(function () {
-                addLine(text, cls);
-                setProgress(pct);
-            }, delay);
+        /* Status messages that cycle */
+        var statusMsgs = [
+            'SYS_BOOT', 'LOADING_MODULES', 'COMPILING_REACT', 'INIT_MONGODB',
+            'SYNC_GITHUB_API', 'BUILD_COMPLETE', 'DEPLOYING...', 'SYSTEM_READY'
+        ];
+        var statusIdx = 0;
+        var statusInterval = setInterval(function () {
+            statusIdx = Math.min(statusIdx + 1, statusMsgs.length - 1);
+            scramble(statusEl, statusMsgs[statusIdx], 400);
+            if (statusIdx === statusMsgs.length - 1) clearInterval(statusInterval);
+        }, 350);
+
+        /* Subtitle scramble sequence */
+        var subtitles = [
+            { text: 'INITIALIZING...',  delay: 0    },
+            { text: 'LOADING STACK...',  delay: 500  },
+            { text: 'COMPILING...',      delay: 1100 },
+            { text: 'DEPLOYING...',      delay: 1750 },
+            { text: 'ONLINE',            delay: 2300 },
+        ];
+        subtitles.forEach(function (s) {
+            setTimeout(function () { scramble(subtitleEl, s.text, 350); }, s.delay);
         });
 
-        /* Show "SYSTEM READY" banner */
-        setTimeout(function () {
-            if (readyEl) {
-                readyEl.classList.add('preloader__ready--show');
-            }
-        }, 2300);
+        /* ── 4. GLITCH BURSTS ── */
+        var glitchTimes = [600, 1050, 1400, 1900, 2250];
+        glitchTimes.forEach(function (t) {
+            setTimeout(function () {
+                /* Flash */
+                flashEl.classList.remove('preloader__flash--on');
+                void flashEl.offsetWidth; /* force reflow */
+                flashEl.classList.add('preloader__flash--on');
+                /* Name shake */
+                nameEl.classList.remove('preloader__name--glitch');
+                void nameEl.offsetWidth;
+                nameEl.classList.add('preloader__name--glitch');
+                setTimeout(function () { nameEl.classList.remove('preloader__name--glitch'); }, 200);
+            }, t);
+        });
 
-        /* Dismiss the preloader */
-        setTimeout(function () {
-            preloader.classList.add('preloader--done');
-            sessionStorage.setItem('ss_loaded', '1');
-            /* Remove from DOM after transition ends */
-            preloader.addEventListener('transitionend', function () {
+        /* ── Progress milestones ── */
+        var milestones = [
+            [300,  18], [600,  32], [900,  47],
+            [1200, 61], [1550, 75], [1850, 88], [2200, 100]
+        ];
+        milestones.forEach(function (m) {
+            setTimeout(function () { setProgress(m[1]); }, m[0]);
+        });
+
+        /* ── 5. DISMISS — Slice shatter ── */
+        function sliceShatter() {
+            cancelAnimationFrame(matrixRaf);
+            cancelAnimationFrame(sparkRaf);
+
+            var NUM_SLICES = 12;
+            var H          = window.innerHeight;
+            var sliceH     = Math.ceil(H / NUM_SLICES);
+
+            /* Snapshot the whole preloader into an offscreen canvas */
+            var snap = document.createElement('canvas');
+            snap.width  = window.innerWidth;
+            snap.height = H;
+            var sCtx = snap.getContext('2d');
+            /* Fill with solid bg — we can't html2canvas so we simulate with the matrix canvas */
+            sCtx.fillStyle = '#0E0E0E';
+            sCtx.fillRect(0, 0, snap.width, snap.height);
+            sCtx.drawImage(canvas, 0, 0);
+
+            /* Build slice divs */
+            for (var i = 0; i < NUM_SLICES; i++) {
+                var slice = document.createElement('div');
+                slice.className = 'preloader__slice';
+                slice.style.top    = (i * sliceH) + 'px';
+                slice.style.height = sliceH + 'px';
+                /* Mini canvas showing that row of the snapshot */
+                var sc = document.createElement('canvas');
+                sc.width  = snap.width;
+                sc.height = sliceH;
+                sc.style.position = 'absolute';
+                sc.style.top  = '0';
+                sc.style.left = '0';
+                sc.style.width  = '100%';
+                sc.style.height = sliceH + 'px';
+                var scCtx = sc.getContext('2d');
+                scCtx.drawImage(snap, 0, i * sliceH, snap.width, sliceH, 0, 0, snap.width, sliceH);
+                slice.appendChild(sc);
+                slicesEl.appendChild(slice);
+            }
+
+            /* Stage zoom + fade */
+            preloader.classList.add('preloader--exit');
+
+            /* Stagger slices left/right alternately */
+            var sliceDivs = slicesEl.querySelectorAll('.preloader__slice');
+            sliceDivs.forEach(function (sl, idx) {
+                var dir  = idx % 2 === 0 ? 1 : -1;
+                var dist = 60 + Math.random() * 160;
+                var delay = 20 + idx * 18;
+                setTimeout(function () {
+                    sl.style.transform = 'translateX(' + (dir * dist) + 'px)';
+                    sl.style.opacity   = '0';
+                }, delay);
+            });
+
+            /* Final: hide & mark session */
+            setTimeout(function () {
                 preloader.style.display = 'none';
-            }, { once: true });
-        }, 2900);
+                sessionStorage.setItem('ss_loaded', '1');
+                window.removeEventListener('resize', resizeMatrix);
+            }, 700);
+        }
+
+        /* Trigger dismiss at 2.9s */
+        setTimeout(sliceShatter, 2900);
     }
 
-    /* Run immediately — no need to wait for DOMContentLoaded
-       since the preloader element is the first thing in <body> */
+    /* Run immediately — preloader is first element in <body> */
     initPreloader();
 
     /* ── GitHub API ── */
