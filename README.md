@@ -106,12 +106,12 @@ Engineered with a raw **Dark Carbon (`#0E0E0E`) & Acid Lime (`#DFFF00`)** cyberp
 
 - 🥇 **WAVE 3.0 — National Hackathon** | *1st Place (National Winner)*
   - 24-hour national hackathon victory for conceiving, architecting, and deploying **BEC Vortex** under time pressure.
+- 🥇 **INNOVATEX** | *Winner*
+  - Championship victory on 4 hours Prototype building competition at Presidency University.
+- 🥇 **Project Contest** | *1st Prize — Project Contest*
+  - Awarded 1st place at Basaveshwar Engineering College, Bagalkote.
 - 🥇 **INNOVATE 2026** | *1st Prize — Technical Paper Presentation*
   - Awarded 1st place at Basaveshwar Engineering College, Bagalkote (Nov 12, 2026).
-- 🥇 **Innovatex** | *Winner*
-  - Championship victory at Presidency University technical competition.
-- 🥇 **Byte Craft** | *Winner*
-  - 1st prize recognition at state-level programming and product build competition.
 
 ---
 
